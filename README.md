@@ -2,11 +2,11 @@
 
 A final project for CMSC 122: Data Sctructure and Algorithm under the BS in Computer Science program at the University of the Philippines Tacloban College
 
-———9§———— *.* ◇ *.* ————9§———— *.* ◇ *.* ————9§————
+———9§———— *.* ◇ *.* ————9§———— *.* ◇ *.* ————9§———— *.* ◇ *.* ————9§———— *.* ◇ *.* ————9§————
 
 ## 📖 Overview
 
-**The Ultimate 2048 Engine** is an enhanced version of the classic 2048 puzzle game that takes your gaming experience to the next level. Built with advanced algorithms and an intuitive interface, this game offers both challenge and strategic assistance for players of all skill levels.
+**The Ultimate 2048 Game** is an enhanced version of the classic 2048 puzzle game that takes your gaming experience to the next level. Built with advanced algorithms and an intuitive interface, this game offers both challenge and strategic assistance for players of all skill levels.
 
 The game features an **expanded 5x5 board** for more complex gameplay and introduces a **Suggest Button** - a move recommendation system that analyzes your board state and provides optimal move suggestions.
 
@@ -60,4 +60,4 @@ The Suggest Button implements analysis system:
 
 🎓 **Mark Asher G. Abesia** - BSCS 2
 
-———9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§————
+———9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§———— *.* ◇ *.* ————9§———— *.* ◇ *.* ————9§————
