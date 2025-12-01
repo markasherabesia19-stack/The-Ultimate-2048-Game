@@ -8,11 +8,13 @@ public class Board {
     private int[][] grid;
     private int size;
     private Random random;
+    private int lastMoveScore;
     
     public Board(int size) {
         this.size = size;
         this.grid = new int[size][size];
         this.random = new Random();
+        this.lastMoveScore = 0;
         initializeBoard();
     }
     
@@ -55,6 +57,7 @@ public class Board {
     public boolean move(Constants.Direction direction) {
         int[][] oldGrid = copyGrid(grid);
         boolean moved = false;
+        lastMoveScore = 0;
         
         switch (direction) {
             case UP:
@@ -136,6 +139,7 @@ public class Board {
         for (int i = 0; i < size - 1; i++) {
             if (result[i] != 0 && result[i] == result[i + 1]) {
                 result[i] *= 2;
+                lastMoveScore += result[i]; 
                 result[i + 1] = 0;
             }
         }
@@ -238,5 +242,9 @@ public class Board {
     
     public void reset() {
         initializeBoard();
+    }
+
+    public int getLastMoveScore() {
+        return lastMoveScore;
     }
 }

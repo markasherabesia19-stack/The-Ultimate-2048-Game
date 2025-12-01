@@ -1,9 +1,9 @@
 package game2048;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import javax.swing.*;
 
 public class Game extends JFrame {
     private Board board;
@@ -11,6 +11,7 @@ public class Game extends JFrame {
     private Suggestion suggestion;
     private int score;
     private JLabel scoreLabel;
+    private JLabel suggestionLabel; 
     private JButton suggestButton;
     private JButton newGameButton;
     
@@ -26,67 +27,84 @@ public class Game extends JFrame {
         score = 0;
         
         initializeUI();
-        addKeyListener(new GameKeyListener());
-        
         setVisible(true);
+        
+        // Request focus after window is visible
+        SwingUtilities.invokeLater(() -> gamePanel.requestFocusInWindow());
     }
     
     private void initializeUI() {
         setLayout(new BorderLayout());
-        
+    
         // Top panel with score and buttons
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new FlowLayout());
         topPanel.setBackground(new Color(250, 248, 239));
-        
+    
         scoreLabel = new JLabel("Score: 0");
         scoreLabel.setFont(Constants.SCORE_FONT);
         scoreLabel.setForeground(Constants.TEXT_DARK);
-        
+    
         newGameButton = new JButton("New Game");
         newGameButton.setFont(Constants.BUTTON_FONT);
         newGameButton.setFocusable(false);
         newGameButton.addActionListener(e -> resetGame());
-        
+    
         suggestButton = new JButton("Suggest Move");
         suggestButton.setFont(Constants.BUTTON_FONT);
         suggestButton.setFocusable(false);
         suggestButton.addActionListener(e -> showSuggestion());
-        
+    
         topPanel.add(scoreLabel);
         topPanel.add(Box.createHorizontalStrut(20));
         topPanel.add(newGameButton);
         topPanel.add(suggestButton);
-        
+    
         add(topPanel, BorderLayout.NORTH);
-        
+    
         // Game panel
         gamePanel = new GamePanel(board);
+        gamePanel.setFocusable(true);
+        gamePanel.addKeyListener(new GameKeyListener());
         add(gamePanel, BorderLayout.CENTER);
-        
-        // Instructions panel
-        JPanel instructionsPanel = new JPanel();
-        instructionsPanel.setBackground(new Color(250, 248, 239));
+    
+        // Bottom panel with instructions and suggestion
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+        bottomPanel.setBackground(new Color(250, 248, 239));
+    
         JLabel instructions = new JLabel("Use Arrow Keys to Play");
         instructions.setFont(new Font("Arial", Font.PLAIN, 14));
         instructions.setForeground(Constants.TEXT_DARK);
-        instructionsPanel.add(instructions);
-        add(instructionsPanel, BorderLayout.SOUTH);
+        instructions.setAlignmentX(Component.CENTER_ALIGNMENT);
+    
+        suggestionLabel = new JLabel("Click 'Suggest Move' for help");
+        suggestionLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        suggestionLabel.setForeground(new Color(0, 123, 255));
+        suggestionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    
+        bottomPanel.add(Box.createVerticalStrut(5));
+        bottomPanel.add(instructions);
+        bottomPanel.add(Box.createVerticalStrut(5));
+        bottomPanel.add(suggestionLabel);
+        bottomPanel.add(Box.createVerticalStrut(5));
+    
+        add(bottomPanel, BorderLayout.SOUTH);
     }
     
     private void resetGame() {
         board.reset();
         score = 0;
         updateScore();
+        suggestionLabel.setText("Click 'Suggest Move' for help");
         gamePanel.repaint();
-        requestFocus();
+        gamePanel.requestFocusInWindow();
     }
     
     private void showSuggestion() {
-        String suggestion = suggestionAlgorithm.getSuggestionMessage();
-        JOptionPane.showMessageDialog(this, suggestion, "Move Suggestion", 
-                                      JOptionPane.INFORMATION_MESSAGE);
-        requestFocus();
+        String message = suggestion.getSuggestionMessage();
+        suggestionLabel.setText(message.replace("\n", " "));
+        gamePanel.requestFocusInWindow();
     }
     
     private void updateScore() {
@@ -94,18 +112,13 @@ public class Game extends JFrame {
     }
     
     private void makeMove(Constants.Direction direction) {
-        int[][] oldGrid = board.copyGrid(board.getGrid());
         boolean moved = board.move(direction);
-        
+    
         if (moved) {
-            // Calculate score increase
-            int[][] newGrid = board.getGrid();
-            int scoreIncrease = calculateScoreIncrease(oldGrid, newGrid);
-            score += scoreIncrease;
+            score += board.getLastMoveScore();
             updateScore();
-            
             gamePanel.repaint();
-            
+        
             // Check win condition
             if (board.getLargestValue() >= Constants.WIN_VALUE) {
                 int option = JOptionPane.showConfirmDialog(this, 
@@ -116,8 +129,9 @@ public class Game extends JFrame {
                     resetGame();
                     return;
                 }
+                gamePanel.requestFocusInWindow();
             }
-            
+        
             // Check lose condition
             if (!board.canMove()) {
                 JOptionPane.showMessageDialog(this, 
@@ -129,34 +143,10 @@ public class Game extends JFrame {
         }
     }
     
-    private int calculateScoreIncrease(int[][] oldGrid, int[][] newGrid) {
-        int increase = 0;
-        int size = board.getSize();
-        
-        // Sum all values in new grid
-        int newSum = 0;
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                newSum += newGrid[i][j];
-            }
-        }
-        
-        // Sum all values in old grid
-        int oldSum = 0;
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                oldSum += oldGrid[i][j];
-            }
-        }
-        
-        // The difference is the score increase (merged tiles)
-        // Note: This is simplified - you may want a different scoring system
-        return newSum - oldSum;
-    }
-    
     private class GameKeyListener extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent e) {
+
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_UP:
                     makeMove(Constants.Direction.UP);

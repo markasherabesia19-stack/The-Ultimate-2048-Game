@@ -8,12 +8,12 @@ import java.util.Map;
 public class Constants {
     // Board settings
     public static final int GRID_SIZE = 5;
-    public static final int TILE_SIZE = 100;
+    public static final int TILE_SIZE = 90;
     public static final int TILE_MARGIN = 15;
     
     // Window settings
     public static final int WINDOW_WIDTH = GRID_SIZE * (TILE_SIZE + TILE_MARGIN) + TILE_MARGIN;
-    public static final int WINDOW_HEIGHT = WINDOW_WIDTH + 150; // Extra space for score and buttons
+    public static final int WINDOW_HEIGHT = WINDOW_WIDTH + 170; // Extra space for score and buttons
     
     // Colors
     public static final Color BACKGROUND_COLOR = new Color(187, 173, 160);
