@@ -1,14 +1,14 @@
 package game2048;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 public class GamePanel extends JPanel {
     private Board board;
     
     public GamePanel(Board board) {
         this.board = board;
-        setBackground(Constants.BACKGROUND_COLOR);
+        setBackground(Color.WHITE);
         setFocusable(true);
     }
     
@@ -25,6 +25,21 @@ public class GamePanel extends JPanel {
         int[][] grid = board.getGrid();
         int size = board.getSize();
         
+        // Draw grid lines
+        g2d.setColor(Color.BLACK);
+        g2d.setStroke(new BasicStroke(2));
+        
+        for (int i = 0; i <= size; i++) {
+            int pos = i * (Constants.TILE_SIZE + Constants.TILE_MARGIN) + Constants.TILE_MARGIN;
+            // Vertical lines
+            g2d.drawLine(Constants.TILE_MARGIN, pos, 
+                        size * (Constants.TILE_SIZE + Constants.TILE_MARGIN) + Constants.TILE_MARGIN, pos);
+            // Horizontal lines
+            g2d.drawLine(pos, Constants.TILE_MARGIN, 
+                        pos, size * (Constants.TILE_SIZE + Constants.TILE_MARGIN) + Constants.TILE_MARGIN);
+        }
+        
+        // Draw tiles
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 int x = j * (Constants.TILE_SIZE + Constants.TILE_MARGIN) + Constants.TILE_MARGIN;
@@ -37,15 +52,11 @@ public class GamePanel extends JPanel {
     
     private void drawTile(Graphics2D g2d, int value, int x, int y) {
         // Draw tile background
-        Color tileColor;
-        if (value == 0) {
-            tileColor = Constants.EMPTY_TILE_COLOR;
-        } else {
-            tileColor = Constants.TILE_COLORS.getOrDefault(value, new Color(60, 58, 50));
+        if (value != 0) {
+            Color tileColor = Constants.TILE_COLORS.getOrDefault(value, new Color(60, 58, 50));
+            g2d.setColor(tileColor);
+            g2d.fillRect(x + 1, y + 1, Constants.TILE_SIZE - 2, Constants.TILE_SIZE - 2);
         }
-        
-        g2d.setColor(tileColor);
-        g2d.fillRoundRect(x, y, Constants.TILE_SIZE, Constants.TILE_SIZE, 10, 10);
         
         // Draw value text
         if (value != 0) {
@@ -55,6 +66,8 @@ public class GamePanel extends JPanel {
             // Adjust font size for larger numbers
             if (text.length() > 3) {
                 font = new Font("Arial", Font.BOLD, 28);
+            } else if (text.length() > 2) {
+                font = new Font("Arial", Font.BOLD, 32);
             }
             
             g2d.setFont(font);

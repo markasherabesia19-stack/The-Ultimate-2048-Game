@@ -8,7 +8,7 @@ import java.util.Map;
 public class Constants {
     // Board settings
     public static final int GRID_SIZE = 5;
-    public static final int TILE_SIZE = 90;
+    public static final int TILE_SIZE = 75;
     public static final int TILE_MARGIN = 15;
     
     // Window settings
