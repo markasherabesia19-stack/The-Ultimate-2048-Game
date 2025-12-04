@@ -12,14 +12,47 @@ public class GameplayScreen extends JPanel {
     private Board board;
     private Timer repaintTimer;
     private Image backgroundImage;
-    private Image suggestionBoxImage;
-    private Image suggestionButtonImage;
     private Rectangle suggestionButtonBounds;
+    private Rectangle newGameButtonBounds;
     private String suggestionText = "Press for suggestion";
     
-    private static final int BOARD_X = 50;
-    private static final int BOARD_Y = 100;
-    private static final int BOARD_SIZE = 500;
+    // Animation variables for cool effects
+    private float pulseAlpha = 0f;
+    private float pulseDirection = 0.02f;
+    private int particleCount = 50;
+    private Particle[] particles;
+    
+    private static final int BOARD_X = 60;
+    private static final int BOARD_Y = 99;
+    private static final int BOARD_SIZE = 478;
+    
+    // Particle class for floating animation
+    class Particle {
+        float x, y, size, speedY, alpha, maxAlpha;
+        Color color;
+        
+        Particle() {
+            reset();
+        }
+        
+        void reset() {
+            x = (float)(Math.random() * 1120);
+            y = 630 + (float)(Math.random() * 100);
+            size = (float)(Math.random() * 3 + 1);
+            speedY = (float)(Math.random() * 0.5 + 0.3);
+            maxAlpha = (float)(Math.random() * 0.5 + 0.3);
+            alpha = maxAlpha;
+            int colorChoice = (int)(Math.random() * 3);
+            if (colorChoice == 0) color = new Color(150, 100, 255);
+            else if (colorChoice == 1) color = new Color(100, 200, 255);
+            else color = new Color(255, 150, 200);
+        }
+        
+        void update() {
+            y -= speedY;
+            if (y < -10) reset();
+        }
+    }
     
     public GameplayScreen(Game game, Board board) {
         this.game = game;
@@ -30,26 +63,54 @@ public class GameplayScreen extends JPanel {
         setFocusable(true);
         
         loadImages();
-        setupSuggestionButton();
+        setupButtons();
         setupKeyListener();
         setupMouseListener();
+        initializeParticles();
         
-        repaintTimer = new Timer(1000, e -> repaint());
+        repaintTimer = new Timer(16, e -> {  // 60 FPS for smooth animation
+            updateAnimations();
+            repaint();
+        });
         repaintTimer.start();
     }
     
     private void loadImages() {
         try {
-            backgroundImage = ImageIO.read(new File("components/images/Back.png"));
-            suggestionBoxImage = ImageIO.read(new File("components/images/suggestiontextbox.png"));
-            suggestionButtonImage = ImageIO.read(new File("components/images/button2.png"));
+            backgroundImage = ImageIO.read(new File("components/images/background.png"));
+            // Not using suggestion box or button images - using code-generated versions
         } catch (Exception e) {
-            System.out.println("Could not load images: " + e.getMessage());
+            System.out.println("Could not load background image: " + e.getMessage());
         }
     }
     
-    private void setupSuggestionButton() {
-        suggestionButtonBounds = new Rectangle(650, 400, 400, 60);
+    private void initializeParticles() {
+        particles = new Particle[particleCount];
+        for (int i = 0; i < particleCount; i++) {
+            particles[i] = new Particle();
+            particles[i].y = (float)(Math.random() * 630); // Spread them out initially
+        }
+    }
+    
+    private void updateAnimations() {
+        // Update pulse effect
+        pulseAlpha += pulseDirection;
+        if (pulseAlpha > 0.3f || pulseAlpha < 0f) {
+            pulseDirection *= -1;
+        }
+        
+        // Update particles
+        for (Particle p : particles) {
+            p.update();
+        }
+    }
+    
+    private void setupButtons() {
+        // Move everything left by about 35 pixels for better balance
+        // Suggestion button - better positioned
+        suggestionButtonBounds = new Rectangle(615, 390, 380, 60);
+        // New Game button below suggestion
+        newGameButtonBounds = new Rectangle(615, 470, 380, 60);
     }
     
     private void setupKeyListener() {
@@ -87,6 +148,16 @@ public class GameplayScreen extends JPanel {
                 if (suggestionButtonBounds.contains(e.getPoint())) {
                     suggestionText = game.getSuggestion();
                     repaint();
+                } else if (newGameButtonBounds.contains(e.getPoint())) {
+                    int choice = JOptionPane.showConfirmDialog(
+                        GameplayScreen.this,
+                        "Start a new game? Current progress will be lost.",
+                        "New Game",
+                        JOptionPane.YES_NO_OPTION
+                    );
+                    if (choice == JOptionPane.YES_OPTION) {
+                        game.startNewGame();
+                    }
                 }
             }
         });
@@ -104,15 +175,30 @@ public class GameplayScreen extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         
         drawBackground(g2d);
+        drawParticles(g2d);
         drawHeader(g2d);
         drawBoard(g2d);
         drawSidePanel(g2d);
+        drawNewGameButton(g2d);
+    }
+    
+    private void drawParticles(Graphics2D g2d) {
+        for (Particle p : particles) {
+            g2d.setColor(new Color(p.color.getRed(), p.color.getGreen(), p.color.getBlue(), (int)(p.alpha * 255)));
+            g2d.fillOval((int)p.x, (int)p.y, (int)p.size, (int)p.size);
+        }
     }
     
     private void drawBackground(Graphics2D g2d) {
+        // First draw a base color
+        g2d.setColor(new Color(10, 10, 30));
+        g2d.fillRect(0, 0, 1120, 630);
+        
+        // Then draw the background image on top if available
         if (backgroundImage != null) {
-            g2d.drawImage(backgroundImage, 0, 0, 1120, 630, null);
+            g2d.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
         } else {
+            // Fallback gradient if image not found
             GradientPaint gradient = new GradientPaint(
                 0, 0, new Color(10, 10, 50),
                 0, 630, new Color(60, 20, 80)
@@ -123,41 +209,53 @@ public class GameplayScreen extends JPanel {
     }
     
     private void drawHeader(Graphics2D g2d) {
-        g2d.setFont(new Font("Arial", Font.BOLD, 28));
+        // Score with glow effect
+        g2d.setFont(new Font("Arial", Font.BOLD, 32));
+        
+        // Glow effect
+        g2d.setColor(new Color(150, 100, 255, (int)(pulseAlpha * 255)));
+        for (int i = 1; i <= 3; i++) {
+            String scoreText = "SCORE: " + game.getScore();
+            FontMetrics fm = g2d.getFontMetrics();
+            int scoreX = (1120 - fm.stringWidth(scoreText)) / 2;
+            g2d.drawString(scoreText, scoreX - i, 70 - i);
+            g2d.drawString(scoreText, scoreX + i, 70 + i);
+        }
+        
+        // Main score text
         g2d.setColor(Color.WHITE);
-        g2d.drawString("THE ULTIMATE 2048 GAME", 350, 40);
-        
-        g2d.setFont(new Font("Arial", Font.BOLD, 24));
-        g2d.drawString("SCORE: " + game.getScore(), 50, 80);
-        
-        long seconds = game.getElapsedTime();
-        long minutes = seconds / 60;
-        seconds = seconds % 60;
-        String timeStr = String.format("TIME: %02d:%02d", minutes, seconds);
-        g2d.drawString(timeStr, 900, 80);
+        String scoreText = "SCORE: " + game.getScore();
+        FontMetrics fm = g2d.getFontMetrics();
+        int scoreX = (1120 - fm.stringWidth(scoreText)) / 2;
+        g2d.drawString(scoreText, scoreX, 70);
     }
     
     private void drawBoard(Graphics2D g2d) {
         int cellSize = BOARD_SIZE / board.getSize();
         
-        g2d.setColor(new Color(30, 20, 60, 150));
+        // Board background
+        g2d.setColor(new Color(30, 20, 60, 180));
         g2d.fillRoundRect(BOARD_X - 10, BOARD_Y - 10, BOARD_SIZE + 20, BOARD_SIZE + 20, 15, 15);
         
+        // Draw all cells in 5x5 grid
         for (int row = 0; row < board.getSize(); row++) {
             for (int col = 0; col < board.getSize(); col++) {
                 int x = BOARD_X + col * cellSize;
                 int y = BOARD_Y + row * cellSize;
                 
-                g2d.setColor(new Color(40, 30, 70, 100));
-                g2d.fillRoundRect(x + 2, y + 2, cellSize - 4, cellSize - 4, 8, 8);
+                // Empty cell background
+                g2d.setColor(new Color(40, 30, 70, 120));
+                g2d.fillRoundRect(x + 3, y + 3, cellSize - 6, cellSize - 6, 10, 10);
                 
-                g2d.setColor(new Color(80, 60, 120, 150));
+                // Cell border
+                g2d.setColor(new Color(80, 60, 120, 180));
                 g2d.setStroke(new BasicStroke(2));
-                g2d.drawRoundRect(x + 2, y + 2, cellSize - 4, cellSize - 4, 8, 8);
+                g2d.drawRoundRect(x + 3, y + 3, cellSize - 6, cellSize - 6, 10, 10);
                 
+                // Draw tile if present
                 Tile tile = board.getTile(row, col);
                 if (tile != null) {
-                    drawTile(g2d, tile, x + 2, y + 2, cellSize - 4);
+                    drawTile(g2d, tile, x + 3, y + 3, cellSize - 6);
                 }
             }
         }
@@ -166,11 +264,11 @@ public class GameplayScreen extends JPanel {
     private void drawTile(Graphics2D g2d, Tile tile, int x, int y, int size) {
         Color bgColor = getTileColor(tile.getValue());
         g2d.setColor(bgColor);
-        g2d.fillRoundRect(x, y, size, size, 8, 8);
+        g2d.fillRoundRect(x, y, size, size, 10, 10);
         
         g2d.setColor(new Color(150, 130, 200, 100));
         g2d.setStroke(new BasicStroke(2));
-        g2d.drawRoundRect(x, y, size, size, 8, 8);
+        g2d.drawRoundRect(x, y, size, size, 10, 10);
         
         g2d.setColor(getTileTextColor(tile.getValue()));
         String text = String.valueOf(tile.getValue());
@@ -213,45 +311,92 @@ public class GameplayScreen extends JPanel {
     }
     
     private void drawSidePanel(Graphics2D g2d) {
-        if (suggestionBoxImage != null) {
-            g2d.drawImage(suggestionBoxImage, 600, 150, 450, 200, null);
-        } else {
-            g2d.setColor(new Color(60, 40, 100, 200));
-            g2d.fillRoundRect(600, 150, 450, 200, 20, 20);
-            
-            g2d.setColor(new Color(100, 80, 150));
-            g2d.setStroke(new BasicStroke(3));
-            g2d.drawRoundRect(600, 150, 450, 200, 20, 20);
-        }
+        // Suggestion box with animated glow - moved left by 35 pixels for better balance
+        g2d.setColor(new Color(120, 80, 220, (int)(50 + pulseAlpha * 100)));
+        g2d.fillRoundRect(563, 97, 484, 266, 22, 22);
         
+        g2d.setColor(new Color(60, 40, 100, 220));
+        g2d.fillRoundRect(565, 99, 480, 260, 20, 20);
+        
+        g2d.setColor(new Color(150, 120, 255, (int)(150 + pulseAlpha * 100)));
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawRoundRect(565, 99, 480, 260, 20, 20);
+        
+        // Suggestion title with glow
+        g2d.setFont(new Font("Arial", Font.BOLD, 26));
+        FontMetrics fm = g2d.getFontMetrics();
+        String title = "SUGGESTION";
+        int titleX = 565 + (480 - fm.stringWidth(title)) / 2;
+        
+        // Title glow
+        g2d.setColor(new Color(150, 100, 255, (int)(pulseAlpha * 200)));
+        g2d.drawString(title, titleX - 1, 139);
+        g2d.drawString(title, titleX + 1, 141);
+        
+        // Main title
         g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Arial", Font.BOLD, 24));
-        g2d.drawString("SUGGESTION", 750, 190);
+        g2d.drawString(title, titleX, 140);
         
+        // Suggestion text
         g2d.setFont(new Font("Arial", Font.PLAIN, 18));
-        drawWrappedText(g2d, suggestionText, 620, 230, 410, 20);
+        drawWrappedText(g2d, suggestionText, 585, 180, 440, 24);
         
-        if (suggestionButtonImage != null) {
-            g2d.drawImage(suggestionButtonImage, suggestionButtonBounds.x, suggestionButtonBounds.y,
-                         suggestionButtonBounds.width, suggestionButtonBounds.height, null);
-        } else {
-            g2d.setColor(new Color(80, 60, 160, 200));
-            g2d.fillRoundRect(suggestionButtonBounds.x, suggestionButtonBounds.y,
-                             suggestionButtonBounds.width, suggestionButtonBounds.height, 20, 20);
-            
-            g2d.setColor(new Color(120, 100, 200));
-            g2d.setStroke(new BasicStroke(3));
-            g2d.drawRoundRect(suggestionButtonBounds.x, suggestionButtonBounds.y,
-                             suggestionButtonBounds.width, suggestionButtonBounds.height, 20, 20);
-            
-            g2d.setColor(Color.WHITE);
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
-            String btnText = "GET SUGGESTION";
-            FontMetrics fm = g2d.getFontMetrics();
-            int textX = suggestionButtonBounds.x + (suggestionButtonBounds.width - fm.stringWidth(btnText)) / 2;
-            int textY = suggestionButtonBounds.y + ((suggestionButtonBounds.height - fm.getHeight()) / 2) + fm.getAscent();
-            g2d.drawString(btnText, textX, textY);
-        }
+        // Suggestion button
+        drawStyledButton(g2d, suggestionButtonBounds, "GET SUGGESTION");
+    }
+    
+    private void drawNewGameButton(Graphics2D g2d) {
+        drawStyledButton(g2d, newGameButtonBounds, "NEW GAME");
+    }
+    
+    private void drawStyledButton(Graphics2D g2d, Rectangle bounds, String text) {
+        // Button outer glow
+        g2d.setColor(new Color(150, 100, 255, (int)(80 + pulseAlpha * 150)));
+        g2d.fillRoundRect(bounds.x - 2, bounds.y - 2, bounds.width + 4, bounds.height + 4, 27, 27);
+        
+        // Button shadow
+        g2d.setColor(new Color(0, 0, 0, 120));
+        g2d.fillRoundRect(bounds.x + 4, bounds.y + 4, 
+                         bounds.width, bounds.height, 25, 25);
+        
+        // Button background with animated gradient
+        GradientPaint buttonGradient = new GradientPaint(
+            bounds.x, bounds.y, new Color(120, 80, 220),
+            bounds.x, bounds.y + bounds.height, new Color(80, 60, 180)
+        );
+        g2d.setPaint(buttonGradient);
+        g2d.fillRoundRect(bounds.x, bounds.y, 
+                         bounds.width, bounds.height, 25, 25);
+        
+        // Button shine effect
+        GradientPaint shine = new GradientPaint(
+            bounds.x, bounds.y, new Color(255, 255, 255, 60),
+            bounds.x, bounds.y + bounds.height / 2, new Color(255, 255, 255, 0)
+        );
+        g2d.setPaint(shine);
+        g2d.fillRoundRect(bounds.x, bounds.y, bounds.width, bounds.height / 2, 25, 25);
+        
+        // Button border with pulse
+        g2d.setColor(new Color(180, 150, 255, (int)(200 + pulseAlpha * 55)));
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawRoundRect(bounds.x, bounds.y, 
+                         bounds.width, bounds.height, 25, 25);
+        
+        // Button text with glow
+        int fontSize = bounds.width > 200 ? 24 : 20;
+        g2d.setFont(new Font("Arial", Font.BOLD, fontSize));
+        FontMetrics fm = g2d.getFontMetrics();
+        int textX = bounds.x + (bounds.width - fm.stringWidth(text)) / 2;
+        int textY = bounds.y + ((bounds.height - fm.getHeight()) / 2) + fm.getAscent();
+        
+        // Text glow
+        g2d.setColor(new Color(200, 180, 255, (int)(pulseAlpha * 200)));
+        g2d.drawString(text, textX - 1, textY - 1);
+        g2d.drawString(text, textX + 1, textY + 1);
+        
+        // Main text
+        g2d.setColor(Color.WHITE);
+        g2d.drawString(text, textX, textY);
     }
     
     private void drawWrappedText(Graphics2D g2d, String text, int x, int y, int maxWidth, int lineHeight) {

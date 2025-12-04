@@ -51,6 +51,13 @@ public class Game extends JFrame {
         gameplayScreen.requestFocusInWindow();
     }
     
+    public void returnToMainMenu() {
+        gameStarted = false;
+        board = null;
+        score = 0;
+        showSplashScreen();
+    }
+    
     public boolean makeMove(int direction) {
         if (!gameStarted) return false;
         
@@ -87,6 +94,7 @@ public class Game extends JFrame {
             "Game Over! Your score: " + score, 
             "Game Over", 
             JOptionPane.INFORMATION_MESSAGE);
+        returnToMainMenu();
     }
     
     private void victory() {
@@ -96,7 +104,7 @@ public class Game extends JFrame {
             JOptionPane.YES_NO_OPTION);
         
         if (choice == JOptionPane.NO_OPTION) {
-            showSplashScreen();
+            returnToMainMenu();
         }
     }
     
