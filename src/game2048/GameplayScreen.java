@@ -288,18 +288,20 @@ public class GameplayScreen extends JPanel {
     
     private Color getTileColor(int value) {
         switch (value) {
-            case 2: return new Color(60, 40, 120);
-            case 4: return new Color(70, 50, 140);
-            case 8: return new Color(80, 60, 160);
-            case 16: return new Color(90, 70, 180);
-            case 32: return new Color(100, 80, 200);
-            case 64: return new Color(110, 90, 220);
-            case 128: return new Color(120, 100, 240);
-            case 256: return new Color(130, 110, 255);
-            case 512: return new Color(140, 90, 230);
-            case 1024: return new Color(150, 80, 220);
-            case 2048: return new Color(160, 70, 210);
-            default: return new Color(170, 60, 200);
+            case 2: return new Color(70, 130, 220);       // Steel Blue
+            case 4: return new Color(65, 105, 225);       // Royal Blue
+            case 8: return new Color(50, 80, 200);        // Medium Blue
+            case 16: return new Color(40, 60, 180);       // Deep Blue
+            case 32: return new Color(35, 45, 160);       // Dark Blue
+            case 64: return new Color(60, 40, 150);       // Blue-Purple
+            case 128: return new Color(70, 50, 160);      // Blue-Purple Medium
+            case 256: return new Color(80, 40, 170);      // Purple-Blue
+            case 512: return new Color(90, 50, 180);      // Purple-Blue Light
+            case 1024: return new Color(110, 50, 190);    // Purple
+            case 2048: return new Color(128, 0, 128);     // Pure Purple
+            case 4096: return new Color(148, 0, 211);     // Dark Violet
+            case 8192: return new Color(138, 43, 226);    // Blue Violet
+            default: return new Color(186, 85, 211);      // Medium Orchid
         }
     }
     
