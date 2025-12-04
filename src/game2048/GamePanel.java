@@ -5,11 +5,20 @@ import javax.swing.*;
 
 public class GamePanel extends JPanel {
     private Board board;
+    private Image backgroundImage;
     
     public GamePanel(Board board) {
         this.board = board;
-        setBackground(Color.WHITE);
+        setBackground(new Color(0, 0, 0, 0));
         setFocusable(true);
+        
+        try {
+            ImageIcon bgIcon = new ImageIcon("components/images/background.png");
+            backgroundImage = bgIcon.getImage();
+        } catch (Exception e) {
+            System.out.println("Could not load background image: " + e.getMessage());
+            backgroundImage = null;
+        }
     }
     
     @Override
@@ -25,9 +34,9 @@ public class GamePanel extends JPanel {
         int[][] grid = board.getGrid();
         int size = board.getSize();
         
-        // Draw grid lines
-        g2d.setColor(Color.BLACK);
-        g2d.setStroke(new BasicStroke(2));
+        // Draw white grid lines - thinner for smaller tiles
+        g2d.setColor(Constants.GRID_COLOR);
+        g2d.setStroke(new BasicStroke(2)); // Thinner lines (was 3)
         
         for (int i = 0; i <= size; i++) {
             int pos = i * (Constants.TILE_SIZE + Constants.TILE_MARGIN) + Constants.TILE_MARGIN;
@@ -55,7 +64,7 @@ public class GamePanel extends JPanel {
         if (value != 0) {
             Color tileColor = Constants.TILE_COLORS.getOrDefault(value, new Color(60, 58, 50));
             g2d.setColor(tileColor);
-            g2d.fillRect(x + 1, y + 1, Constants.TILE_SIZE - 2, Constants.TILE_SIZE - 2);
+            g2d.fillRect(x + 2, y + 2, Constants.TILE_SIZE - 4, Constants.TILE_SIZE - 4);
         }
         
         // Draw value text
@@ -63,11 +72,11 @@ public class GamePanel extends JPanel {
             String text = String.valueOf(value);
             Font font = Constants.TILE_FONT;
             
-            // Adjust font size for larger numbers
+            // Adjust font size for larger numbers - scaled down
             if (text.length() > 3) {
-                font = new Font("Arial", Font.BOLD, 28);
+                font = new Font("Arial", Font.BOLD, 24); // Was 45
             } else if (text.length() > 2) {
-                font = new Font("Arial", Font.BOLD, 32);
+                font = new Font("Arial", Font.BOLD, 28); // Was 52
             }
             
             g2d.setFont(font);
@@ -85,7 +94,7 @@ public class GamePanel extends JPanel {
             int textHeight = fm.getAscent();
             
             int textX = x + (Constants.TILE_SIZE - textWidth) / 2;
-            int textY = y + (Constants.TILE_SIZE + textHeight) / 2 - 5;
+            int textY = y + (Constants.TILE_SIZE + textHeight) / 2 - 3; // Adjusted offset
             
             g2d.drawString(text, textX, textY);
         }

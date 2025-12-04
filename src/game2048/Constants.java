@@ -9,17 +9,24 @@ public class Constants {
     // Board settings
     public static final int GRID_SIZE = 5;
     public static final int TILE_SIZE = 75;
-    public static final int TILE_MARGIN = 15;
+    public static final int TILE_MARGIN = 10;
     
     // Window settings
-    public static final int WINDOW_WIDTH = GRID_SIZE * (TILE_SIZE + TILE_MARGIN) + TILE_MARGIN;
-    public static final int WINDOW_HEIGHT = WINDOW_WIDTH + 170; // Extra space for score and buttons
+    public static final int WINDOW_WIDTH = 1120;
+    public static final int WINDOW_HEIGHT = 630;
+    
+    // Game board positioning (centered on screen)
+    public static final int BOARD_WIDTH = GRID_SIZE * (TILE_SIZE + TILE_MARGIN) + TILE_MARGIN;
+    public static final int BOARD_HEIGHT = GRID_SIZE * (TILE_SIZE + TILE_MARGIN) + TILE_MARGIN;
+    public static final int BOARD_X_OFFSET = 50; // Left margin for board
+    public static final int BOARD_Y_OFFSET = 100; // Top margin for board
     
     // Colors
     public static final Color BACKGROUND_COLOR = new Color(187, 173, 160);
     public static final Color EMPTY_TILE_COLOR = new Color(205, 193, 180);
     public static final Color TEXT_DARK = new Color(119, 110, 101);
     public static final Color TEXT_LIGHT = new Color(249, 246, 242);
+    public static final Color GRID_COLOR = Color.WHITE; // White grid lines
     
     // Tile colors map
     public static final Map<Integer, Color> TILE_COLORS = new HashMap<Integer, Color>() {{
@@ -38,7 +45,7 @@ public class Constants {
     }};
     
     // Font settings
-    public static final Font TILE_FONT = new Font("Arial", Font.BOLD, 36);
+    public static final Font TILE_FONT = new Font("Arial", Font.BOLD, 32);
     public static final Font SCORE_FONT = new Font("Arial", Font.BOLD, 24);
     public static final Font BUTTON_FONT = new Font("Arial", Font.BOLD, 16);
     

@@ -6,23 +6,17 @@ import java.util.List;
 public class Suggestion {
     private Board board;
     
-    public Suggestion
-    (Board board) {
+    public Suggestion(Board board) {
         this.board = board;
     }
     
-    /**
-     * Find the best move based on creating a merge equal to the largest value
-     * @return Direction to move, or null if no good move found
-     */
     public Constants.Direction findBestMove() {
         int largestValue = board.getLargestValue();
         
         if (largestValue == 0) {
-            return null; // Empty board
+            return null;
         }
         
-        // Try each direction and see which creates the target merge
         Constants.Direction[] directions = Constants.Direction.values();
         List<Constants.Direction> validMoves = new ArrayList<>();
         
@@ -32,52 +26,36 @@ public class Suggestion {
             }
         }
         
-        // If we found moves that create the target merge, return the first one
         if (!validMoves.isEmpty()) {
             return validMoves.get(0);
         }
         
-        // If no move creates the target merge, suggest any valid move
         for (Constants.Direction direction : directions) {
             if (isValidMove(direction)) {
                 return direction;
             }
         }
         
-        return null; // No valid moves
+        return null;
     }
     
-    /**
-     * Check if a move creates a merge equal to the target value
-     */
     private boolean createsMerge(Constants.Direction direction, int targetValue) {
-        // Create a simulation board
         Board simulationBoard = new Board(board.getSize());
         simulationBoard.setGrid(board.copyGrid(board.getGrid()));
         
         int[][] beforeGrid = simulationBoard.copyGrid(simulationBoard.getGrid());
-        
-        // Simulate the move without adding random tile
         boolean moved = simulateMove(simulationBoard, direction);
         
         if (!moved) {
-            return false; // Move not valid
+            return false;
         }
         
         int[][] afterGrid = simulationBoard.getGrid();
-        
-        // Check if any merge created the target value
         return hasMergedTo(beforeGrid, afterGrid, targetValue);
     }
     
-    /**
-     * Check if the move from beforeGrid to afterGrid created a tile with targetValue
-     * by merging (not just moving an existing tile)
-     */
     private boolean hasMergedTo(int[][] before, int[][] after, int targetValue) {
         int size = before.length;
-        
-        // Count occurrences of targetValue before and after
         int countBefore = 0;
         int countAfter = 0;
         
@@ -92,13 +70,9 @@ public class Suggestion {
             }
         }
         
-        // If count increased, a merge created a new instance of targetValue
         return countAfter > countBefore;
     }
     
-    /**
-     * Simulate a move without adding a random tile
-     */
     private boolean simulateMove(Board simBoard, Constants.Direction direction) {
         int[][] oldGrid = simBoard.copyGrid(simBoard.getGrid());
         
@@ -117,7 +91,6 @@ public class Suggestion {
                 break;
         }
         
-        // Check if board changed
         return !gridsEqual(oldGrid, simBoard.getGrid());
     }
     
@@ -162,14 +135,12 @@ public class Suggestion {
         int[] result = new int[size];
         int position = 0;
         
-        // Move all non-zero values to the left
         for (int i = 0; i < size; i++) {
             if (line[i] != 0) {
                 result[position++] = line[i];
             }
         }
         
-        // Merge adjacent equal values
         for (int i = 0; i < size - 1; i++) {
             if (result[i] != 0 && result[i] == result[i + 1]) {
                 result[i] *= 2;
@@ -177,7 +148,6 @@ public class Suggestion {
             }
         }
         
-        // Move non-zero values to the left again
         int[] finalResult = new int[size];
         position = 0;
         for (int i = 0; i < size; i++) {
@@ -227,34 +197,23 @@ public class Suggestion {
         return simulateMove(simulationBoard, direction);
     }
     
-    /**
-     * Get areadable suggestion message
-     */
-    public String getSuggestionMessage() {
+    public String getDetailedSuggestion() {
         Constants.Direction bestMove = findBestMove();
         
         if (bestMove == null) {
-            return "No valid moves available!";
+            return "NO VALID MOVES\n\nGame over!";
         }
         
         int largestValue = board.getLargestValue();
-        String directionText = "";
+        String arrow = "";
         
         switch (bestMove) {
-            case UP:
-                directionText = "UP (↑)";
-                break;
-            case DOWN:
-                directionText = "DOWN (↓)";
-                break;
-            case LEFT:
-                directionText = "LEFT (←)";
-                break;
-            case RIGHT:
-                directionText = "RIGHT (→)";
-                break;
+            case UP: arrow = "↑"; break;
+            case DOWN: arrow = "↓"; break;
+            case LEFT: arrow = "←"; break;
+            case RIGHT: arrow = "→"; break;
         }
         
-        return "Suggestion: Move " + directionText + "\n(Targeting merge to " + largestValue + ")";
+        return "SUGGESTED MOVE\n\nMove " + bestMove + " " + arrow + "\n\nThis will help create a merge toward " + largestValue + "!";
     }
 }

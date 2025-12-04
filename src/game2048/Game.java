@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 
 public class Game extends JFrame {
     private Board board;
@@ -16,18 +15,29 @@ public class Game extends JFrame {
     private JButton suggestButton;
     private JButton solveButton;
     private JButton newGameButton;
+    private Image backgroundImage;
     
     public Game() {
         setTitle("The Ultimate 2048 Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
+        setUndecorated(true);
         
         board = new Board(Constants.GRID_SIZE);
         suggestion = new Suggestion(board);
         score = 0;
         
+        // Load background image
+        try {
+            ImageIcon bgIcon = new ImageIcon("components/images/background.png");
+            backgroundImage = bgIcon.getImage().getScaledInstance(1280, 720, Image.SCALE_SMOOTH);
+        } catch (Exception e) {
+            System.out.println("Could not load background image: " + e.getMessage());
+            backgroundImage = null;
+        }
+        
         initializeUI();
-        pack();
+        setSize(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
         setLocationRelativeTo(null);
         setVisible(true);
         
@@ -35,110 +45,116 @@ public class Game extends JFrame {
     }
     
     private void initializeUI() {
-        setLayout(new BorderLayout(20, 20));
-        getContentPane().setBackground(Color.WHITE);
-        ((JPanel)getContentPane()).setBorder(new EmptyBorder(20, 20, 20, 20));
+        // Main panel with background image
+        JPanel mainPanel = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (backgroundImage != null) {
+                    g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+                }
+            }
+        };
+        mainPanel.setPreferredSize(new Dimension(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT));
         
-        // Left side - Game board with score on top
-        JPanel leftPanel = new JPanel(new BorderLayout(0, 10));
-        leftPanel.setBackground(Color.WHITE);
-        
-        // Score panel
+        // Score panel - positioned at top
         JPanel scorePanel = new JPanel();
         scorePanel.setLayout(new BoxLayout(scorePanel, BoxLayout.X_AXIS));
-        scorePanel.setBackground(Color.WHITE);
-        scorePanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-        scorePanel.setMaximumSize(new Dimension(500, 50));
+        scorePanel.setBackground(new Color(255, 255, 255, 150)); // Semi-transparent white
+        scorePanel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 3));
+        scorePanel.setBounds(Constants.BOARD_X_OFFSET, 50, Constants.BOARD_WIDTH, 80);
         
         JLabel scoreTitle = new JLabel("SCORE");
-        scoreTitle.setFont(new Font("Arial", Font.BOLD, 16));
-        scoreTitle.setBorder(new EmptyBorder(10, 10, 10, 10));
+        scoreTitle.setFont(new Font("Arial", Font.BOLD, 28));
+        scoreTitle.setForeground(Color.BLACK);
+        scoreTitle.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         
         scoreLabel = new JLabel("0");
-        scoreLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        scoreLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        scoreLabel.setFont(new Font("Arial", Font.BOLD, 42));
+        scoreLabel.setForeground(Color.BLACK);
+        scoreLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         
         scorePanel.add(scoreTitle);
         scorePanel.add(Box.createHorizontalGlue());
         scorePanel.add(scoreLabel);
         
-        leftPanel.add(scorePanel, BorderLayout.NORTH);
+        mainPanel.add(scorePanel);
         
-        // Game panel with border
+        // Game panel
         gamePanel = new GamePanel(board);
         gamePanel.setFocusable(true);
         gamePanel.addKeyListener(new GameKeyListener());
-        gamePanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-        gamePanel.setPreferredSize(new Dimension(
-            Constants.GRID_SIZE * (Constants.TILE_SIZE + Constants.TILE_MARGIN) + Constants.TILE_MARGIN,
-            Constants.GRID_SIZE * (Constants.TILE_SIZE + Constants.TILE_MARGIN) + Constants.TILE_MARGIN
-        ));
+        gamePanel.setBounds(Constants.BOARD_X_OFFSET, Constants.BOARD_Y_OFFSET, 
+                           Constants.BOARD_WIDTH, Constants.BOARD_HEIGHT);
+        gamePanel.setOpaque(false); // Make transparent to show background
         
-        leftPanel.add(gamePanel, BorderLayout.CENTER);
+        mainPanel.add(gamePanel);
         
-        add(leftPanel, BorderLayout.CENTER);
-        
-        // Right side - Control panel
-        JPanel rightPanel = new JPanel();
-        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-        rightPanel.setBackground(Color.WHITE);
-        rightPanel.setPreferredSize(new Dimension(300, 0));
+        // Right side control panel
+        int rightPanelX = Constants.BOARD_X_OFFSET + Constants.BOARD_WIDTH + 80;
+        int rightPanelWidth = 400;
         
         // Suggestion text area
-        suggestionTextArea = new JTextArea(8, 15);
-        suggestionTextArea.setFont(new Font("Arial", Font.PLAIN, 12));
+        suggestionTextArea = new JTextArea(10, 20);
+        suggestionTextArea.setFont(new Font("Arial", Font.PLAIN, 16));
         suggestionTextArea.setLineWrap(true);
         suggestionTextArea.setWrapStyleWord(true);
         suggestionTextArea.setEditable(false);
         suggestionTextArea.setText("SUGGESTION TEXT\n\nClick 'Suggest Move' for intelligent move recommendations.");
+        suggestionTextArea.setBackground(new Color(255, 255, 255, 150));
+        suggestionTextArea.setForeground(Color.BLACK);
         suggestionTextArea.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(Color.BLACK, 2),
-            new EmptyBorder(10, 10, 10, 10)
+            BorderFactory.createLineBorder(Color.WHITE, 3),
+            BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
         
         JScrollPane scrollPane = new JScrollPane(suggestionTextArea);
-        scrollPane.setMaximumSize(new Dimension(200, 150));
-        scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+        scrollPane.setBounds(rightPanelX, Constants.BOARD_Y_OFFSET, rightPanelWidth, 250);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
         
-        rightPanel.add(scrollPane);
-        rightPanel.add(Box.createVerticalStrut(20));
+        mainPanel.add(scrollPane);
         
         // Buttons
+        int buttonY = Constants.BOARD_Y_OFFSET + 300;
+        int buttonSpacing = 80;
+        
         suggestButton = createStyledButton("SUGGEST MOVE");
+        suggestButton.setBounds(rightPanelX, buttonY, rightPanelWidth, 60);
         suggestButton.addActionListener(e -> showSuggestion());
+        mainPanel.add(suggestButton);
         
         solveButton = createStyledButton("SOLVE THE NEXT NUMBER");
+        solveButton.setBounds(rightPanelX, buttonY + buttonSpacing, rightPanelWidth, 60);
         solveButton.addActionListener(e -> solveNextNumber());
+        mainPanel.add(solveButton);
         
         newGameButton = createStyledButton("NEW GAME");
+        newGameButton.setBounds(rightPanelX, buttonY + buttonSpacing * 2, rightPanelWidth, 60);
         newGameButton.addActionListener(e -> resetGame());
+        mainPanel.add(newGameButton);
         
-        rightPanel.add(suggestButton);
-        rightPanel.add(Box.createVerticalStrut(10));
-        rightPanel.add(solveButton);
-        rightPanel.add(Box.createVerticalStrut(10));
-        rightPanel.add(newGameButton);
-        rightPanel.add(Box.createVerticalGlue());
-        
-        add(rightPanel, BorderLayout.EAST);
+        setContentPane(mainPanel);
     }
     
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Arial", Font.BOLD, 12));
+        button.setFont(new Font("Arial", Font.BOLD, 18));
         button.setFocusable(false);
-        button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.setMaximumSize(new Dimension(200, 40));
-        button.setBackground(Color.WHITE);
-        button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        button.setBackground(new Color(255, 255, 255, 150));
+        button.setForeground(Color.BLACK);
+        button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 3));
+        button.setContentAreaFilled(false);
+        button.setOpaque(true);
         
         // Hover effect
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(240, 240, 240));
+                button.setBackground(new Color(255, 255, 255, 220));
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(Color.WHITE);
+                button.setBackground(new Color(255, 255, 255, 150));
             }
         });
         
@@ -220,6 +236,9 @@ public class Game extends JFrame {
                     break;
                 case KeyEvent.VK_RIGHT:
                     makeMove(Constants.Direction.RIGHT);
+                    break;
+                case KeyEvent.VK_ESCAPE:
+                    System.exit(0);
                     break;
             }
         }
