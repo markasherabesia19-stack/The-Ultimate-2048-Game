@@ -1,219 +1,221 @@
 package game2048;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Suggestion {
-    private Board board;
     
-    public Suggestion(Board board) {
-        this.board = board;
-    }
-    
-    public Constants.Direction findBestMove() {
-        int largestValue = board.getLargestValue();
-        
-        if (largestValue == 0) {
-            return null;
+    public static String getBestMove(Board board) {
+        if (board == null || board.isGameOver()) {
+            return "No moves available - Game Over!";
         }
         
-        Constants.Direction[] directions = Constants.Direction.values();
-        List<Constants.Direction> validMoves = new ArrayList<>();
+        int bestDirection = -1;
+        int bestScore = -1;
+        String[] directionNames = {"UP ↑", "DOWN ↓", "LEFT ←", "RIGHT →"};
         
-        for (Constants.Direction direction : directions) {
-            if (createsMerge(direction, largestValue)) {
-                validMoves.add(direction);
-            }
-        }
-        
-        if (!validMoves.isEmpty()) {
-            return validMoves.get(0);
-        }
-        
-        for (Constants.Direction direction : directions) {
-            if (isValidMove(direction)) {
-                return direction;
-            }
-        }
-        
-        return null;
-    }
-    
-    private boolean createsMerge(Constants.Direction direction, int targetValue) {
-        Board simulationBoard = new Board(board.getSize());
-        simulationBoard.setGrid(board.copyGrid(board.getGrid()));
-        
-        int[][] beforeGrid = simulationBoard.copyGrid(simulationBoard.getGrid());
-        boolean moved = simulateMove(simulationBoard, direction);
-        
-        if (!moved) {
-            return false;
-        }
-        
-        int[][] afterGrid = simulationBoard.getGrid();
-        return hasMergedTo(beforeGrid, afterGrid, targetValue);
-    }
-    
-    private boolean hasMergedTo(int[][] before, int[][] after, int targetValue) {
-        int size = before.length;
-        int countBefore = 0;
-        int countAfter = 0;
-        
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (before[i][j] == targetValue) {
-                    countBefore++;
-                }
-                if (after[i][j] == targetValue) {
-                    countAfter++;
+        for (int direction = 0; direction < 4; direction++) {
+            Board testBoard = board.copy();
+            
+            if (testBoard.move(direction)) {
+                int moveScore = evaluateBoard(testBoard);
+                
+                if (moveScore > bestScore) {
+                    bestScore = moveScore;
+                    bestDirection = direction;
                 }
             }
         }
         
-        return countAfter > countBefore;
-    }
-    
-    private boolean simulateMove(Board simBoard, Constants.Direction direction) {
-        int[][] oldGrid = simBoard.copyGrid(simBoard.getGrid());
-        
-        switch (direction) {
-            case UP:
-                simulateMoveUp(simBoard);
-                break;
-            case DOWN:
-                simulateMoveDown(simBoard);
-                break;
-            case LEFT:
-                simulateMoveLeft(simBoard);
-                break;
-            case RIGHT:
-                simulateMoveRight(simBoard);
-                break;
+        if (bestDirection == -1) {
+            return "No valid moves available!";
         }
         
-        return !gridsEqual(oldGrid, simBoard.getGrid());
+        return "Suggested move: " + directionNames[bestDirection] + 
+               " (Score potential: " + bestScore + ")";
     }
     
-    private void simulateMoveLeft(Board simBoard) {
-        int size = simBoard.getSize();
-        int[][] grid = simBoard.getGrid();
+    private static int evaluateBoard(Board board) {
+        int score = 0;
         
-        for (int i = 0; i < size; i++) {
-            int[] row = grid[i];
-            int[] newRow = mergeLine(row);
-            grid[i] = newRow;
-        }
-    }
-    
-    private void simulateMoveRight(Board simBoard) {
-        int size = simBoard.getSize();
-        int[][] grid = simBoard.getGrid();
+        score += board.getScore() * 2;
         
-        for (int i = 0; i < size; i++) {
-            int[] row = grid[i];
-            int[] reversed = reverse(row);
-            int[] merged = mergeLine(reversed);
-            int[] newRow = reverse(merged);
-            grid[i] = newRow;
-        }
-    }
-    
-    private void simulateMoveUp(Board simBoard) {
-        transpose(simBoard);
-        simulateMoveLeft(simBoard);
-        transpose(simBoard);
-    }
-    
-    private void simulateMoveDown(Board simBoard) {
-        transpose(simBoard);
-        simulateMoveRight(simBoard);
-        transpose(simBoard);
-    }
-    
-    private int[] mergeLine(int[] line) {
-        int size = line.length;
-        int[] result = new int[size];
-        int position = 0;
+        score += board.getEmptyCellCount() * 100;
         
-        for (int i = 0; i < size; i++) {
-            if (line[i] != 0) {
-                result[position++] = line[i];
+        score += board.getHighestTile() * 10;
+        
+        score += evaluateMonotonicity(board) * 50;
+        
+        score += evaluateSmoothness(board) * 30;
+        
+        score += evaluateCornerStrategy(board) * 80;
+        
+        return score;
+    }
+    
+    private static int evaluateMonotonicity(Board board) {
+        int size = board.getSize();
+        int monotonicity = 0;
+        
+        for (int row = 0; row < size; row++) {
+            boolean increasing = true;
+            boolean decreasing = true;
+            
+            for (int col = 0; col < size - 1; col++) {
+                Tile current = board.getTile(row, col);
+                Tile next = board.getTile(row, col + 1);
+                
+                if (current != null && next != null) {
+                    if (current.getValue() > next.getValue()) {
+                        increasing = false;
+                    }
+                    if (current.getValue() < next.getValue()) {
+                        decreasing = false;
+                    }
+                }
             }
+            
+            if (increasing || decreasing) monotonicity += 10;
         }
         
-        for (int i = 0; i < size - 1; i++) {
-            if (result[i] != 0 && result[i] == result[i + 1]) {
-                result[i] *= 2;
-                result[i + 1] = 0;
+        for (int col = 0; col < size; col++) {
+            boolean increasing = true;
+            boolean decreasing = true;
+            
+            for (int row = 0; row < size - 1; row++) {
+                Tile current = board.getTile(row, col);
+                Tile next = board.getTile(row + 1, col);
+                
+                if (current != null && next != null) {
+                    if (current.getValue() > next.getValue()) {
+                        increasing = false;
+                    }
+                    if (current.getValue() < next.getValue()) {
+                        decreasing = false;
+                    }
+                }
             }
+            
+            if (increasing || decreasing) monotonicity += 10;
         }
         
-        int[] finalResult = new int[size];
-        position = 0;
-        for (int i = 0; i < size; i++) {
-            if (result[i] != 0) {
-                finalResult[position++] = result[i];
-            }
-        }
-        
-        return finalResult;
+        return monotonicity;
     }
     
-    private void transpose(Board simBoard) {
-        int size = simBoard.getSize();
-        int[][] grid = simBoard.getGrid();
+    private static int evaluateSmoothness(Board board) {
+        int size = board.getSize();
+        int smoothness = 0;
         
-        for (int i = 0; i < size; i++) {
-            for (int j = i + 1; j < size; j++) {
-                int temp = grid[i][j];
-                grid[i][j] = grid[j][i];
-                grid[j][i] = temp;
-            }
-        }
-    }
-    
-    private int[] reverse(int[] array) {
-        int[] result = new int[array.length];
-        for (int i = 0; i < array.length; i++) {
-            result[i] = array[array.length - 1 - i];
-        }
-        return result;
-    }
-    
-    private boolean gridsEqual(int[][] a, int[][] b) {
-        for (int i = 0; i < a.length; i++) {
-            for (int j = 0; j < a[i].length; j++) {
-                if (a[i][j] != b[i][j]) {
-                    return false;
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                Tile current = board.getTile(row, col);
+                if (current != null) {
+                    int value = current.getValue();
+                    
+                    if (col < size - 1) {
+                        Tile right = board.getTile(row, col + 1);
+                        if (right != null) {
+                            int diff = Math.abs(value - right.getValue());
+                            smoothness -= diff;
+                        }
+                    }
+                    
+                    if (row < size - 1) {
+                        Tile down = board.getTile(row + 1, col);
+                        if (down != null) {
+                            int diff = Math.abs(value - down.getValue());
+                            smoothness -= diff;
+                        }
+                    }
                 }
             }
         }
-        return true;
+        
+        return smoothness;
     }
     
-    private boolean isValidMove(Constants.Direction direction) {
-        Board simulationBoard = new Board(board.getSize());
-        simulationBoard.setGrid(board.copyGrid(board.getGrid()));
-        return simulateMove(simulationBoard, direction);
+    private static int evaluateCornerStrategy(Board board) {
+        int score = 0;
+        int size = board.getSize();
+        int highestValue = board.getHighestTile();
+        
+        int[][] corners = {{0, 0}, {0, size-1}, {size-1, 0}, {size-1, size-1}};
+        
+        for (int[] corner : corners) {
+            Tile tile = board.getTile(corner[0], corner[1]);
+            if (tile != null && tile.getValue() == highestValue) {
+                score += 100;
+                
+                if (corner[0] == 0 || corner[0] == size - 1) {
+                    for (int col = 0; col < size; col++) {
+                        Tile edgeTile = board.getTile(corner[0], col);
+                        if (edgeTile != null) {
+                            score += edgeTile.getValue() / 10;
+                        }
+                    }
+                }
+                
+                if (corner[1] == 0 || corner[1] == size - 1) {
+                    for (int row = 0; row < size; row++) {
+                        Tile edgeTile = board.getTile(row, corner[1]);
+                        if (edgeTile != null) {
+                            score += edgeTile.getValue() / 10;
+                        }
+                    }
+                }
+                
+                break;
+            }
+        }
+        
+        return score;
     }
     
-    public String getDetailedSuggestion() {
-        Constants.Direction bestMove = findBestMove();
+    public static int[] findHighestTilePosition(Board board) {
+        int size = board.getSize();
+        int maxValue = 0;
+        int[] position = new int[]{-1, -1};
         
-        if (bestMove == null) {
-            return "NO VALID MOVES\n\nGame over!";
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                Tile tile = board.getTile(row, col);
+                if (tile != null && tile.getValue() > maxValue) {
+                    maxValue = tile.getValue();
+                    position[0] = row;
+                    position[1] = col;
+                }
+            }
         }
         
-        int largestValue = board.getLargestValue();
-        String arrow = "";
+        return position;
+    }
+    
+    public static int countMergePossibilities(Board board, int direction) {
+        Board testBoard = board.copy();
+        int size = board.getSize();
+        int mergeCount = 0;
         
-        switch (bestMove) {
-            case UP: arrow = "↑"; break;
-            case DOWN: arrow = "↓"; break;
-            case LEFT: arrow = "←"; break;
-            case RIGHT: arrow = "→"; break;
+        if (direction == Board.UP || direction == Board.DOWN) {
+            for (int col = 0; col < size; col++) {
+                for (int row = 0; row < size - 1; row++) {
+                    Tile current = board.getTile(row, col);
+                    Tile next = board.getTile(row + 1, col);
+                    if (current != null && next != null && 
+                        current.getValue() == next.getValue()) {
+                        mergeCount++;
+                    }
+                }
+            }
+        } else {
+            for (int row = 0; row < size; row++) {
+                for (int col = 0; col < size - 1; col++) {
+                    Tile current = board.getTile(row, col);
+                    Tile next = board.getTile(row, col + 1);
+                    if (current != null && next != null && 
+                        current.getValue() == next.getValue()) {
+                        mergeCount++;
+                    }
+                }
+            }
         }
         
-        return "SUGGESTED MOVE\n\nMove " + bestMove + " " + arrow + "\n\nThis will help create a merge toward " + largestValue + "!";
+        return mergeCount;
     }
 }

@@ -2,13 +2,11 @@ package game2048;
 
 public class Tile {
     private int value;
-    private int row;
-    private int col;
+    private boolean merged;
     
-    public Tile(int value, int row, int col) {
+    public Tile(int value) {
         this.value = value;
-        this.row = row;
-        this.col = col;
+        this.merged = false;
     }
     
     public int getValue() {
@@ -19,32 +17,30 @@ public class Tile {
         this.value = value;
     }
     
-    public int getRow() {
-        return row;
+    public void doubleValue() {
+        this.value *= 2;
     }
     
-    public void setRow(int row) {
-        this.row = row;
+    public boolean isMerged() {
+        return merged;
     }
     
-    public int getCol() {
-        return col;
+    public void setMerged(boolean merged) {
+        this.merged = merged;
     }
     
-    public void setCol(int col) {
-        this.col = col;
-    }
-    
-    public boolean canMergeWith(Tile other) {
-        return other != null && this.value == other.getValue();
-    }
-    
-    public boolean isEmpty() {
-        return value == 0;
+    public void resetMerged() {
+        this.merged = false;
     }
     
     @Override
     public String toString() {
         return String.valueOf(value);
+    }
+    
+    public Tile copy() {
+        Tile copy = new Tile(this.value);
+        copy.merged = this.merged;
+        return copy;
     }
 }

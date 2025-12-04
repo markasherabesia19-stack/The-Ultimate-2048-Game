@@ -1,63 +1,71 @@
 package game2048;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Board {
-    private int[][] grid;
+    public static final int UP = 0;
+    public static final int DOWN = 1;
+    public static final int LEFT = 2;
+    public static final int RIGHT = 3;
+    
     private int size;
-    private Random random;
-    private int lastMoveScore;
+    private Tile[][] grid;
+    private int score;
+    private boolean hasWon;
     
     public Board(int size) {
         this.size = size;
-        this.grid = new int[size][size];
-        this.random = new Random();
-        this.lastMoveScore = 0;
-        initializeBoard();
+        this.grid = new Tile[size][size];
+        this.score = 0;
+        this.hasWon = false;
     }
     
-    private void initializeBoard() {
-        // Clear the board
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                grid[i][j] = 0;
-            }
+    public int getSize() {
+        return size;
+    }
+    
+    public Tile getTile(int row, int col) {
+        if (row >= 0 && row < size && col >= 0 && col < size) {
+            return grid[row][col];
         }
-        // Add two initial tiles
-        addRandomTile();
-        addRandomTile();
+        return null;
+    }
+    
+    public void setTile(int row, int col, Tile tile) {
+        if (row >= 0 && row < size && col >= 0 && col < size) {
+            grid[row][col] = tile;
+        }
+    }
+    
+    public int getScore() {
+        return score;
+    }
+    
+    public boolean hasWon() {
+        return hasWon;
     }
     
     public void addRandomTile() {
-        List<int[]> emptyPositions = getEmptyPositions();
-        if (emptyPositions.isEmpty()) {
-            return;
-        }
+        List<int[]> emptyCells = new ArrayList<>();
         
-        int[] position = emptyPositions.get(random.nextInt(emptyPositions.size()));
-        // 90% chance of 2, 10% chance of 4
-        int value = random.nextInt(10) < 9 ? 2 : 4;
-        grid[position[0]][position[1]] = value;
-    }
-    
-    private List<int[]> getEmptyPositions() {
-        List<int[]> emptyPositions = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (grid[i][j] == 0) {
-                    emptyPositions.add(new int[]{i, j});
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                if (grid[row][col] == null) {
+                    emptyCells.add(new int[]{row, col});
                 }
             }
         }
-        return emptyPositions;
+        
+        if (!emptyCells.isEmpty()) {
+            int[] cell = emptyCells.get((int)(Math.random() * emptyCells.size()));
+            int value = Math.random() < 0.9 ? 2 : 4;
+            grid[cell[0]][cell[1]] = new Tile(value);
+        }
     }
     
-    public boolean move(Constants.Direction direction) {
-        int[][] oldGrid = copyGrid(grid);
+    public boolean move(int direction) {
         boolean moved = false;
-        lastMoveScore = 0;
+        resetMergedFlags();
         
         switch (direction) {
             case UP:
@@ -74,9 +82,92 @@ public class Board {
                 break;
         }
         
-        // Check if board changed
-        if (moved) {
-            addRandomTile();
+        return moved;
+    }
+    
+    private void resetMergedFlags() {
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                if (grid[row][col] != null) {
+                    grid[row][col].resetMerged();
+                }
+            }
+        }
+    }
+    
+    private boolean moveUp() {
+        boolean moved = false;
+        
+        for (int col = 0; col < size; col++) {
+            int writePos = 0;
+            
+            for (int row = 0; row < size; row++) {
+                if (grid[row][col] != null) {
+                    Tile current = grid[row][col];
+                    
+                    if (writePos > 0 && grid[writePos - 1][col] != null && 
+                        grid[writePos - 1][col].getValue() == current.getValue() && 
+                        !grid[writePos - 1][col].isMerged()) {
+                        
+                        grid[writePos - 1][col].doubleValue();
+                        grid[writePos - 1][col].setMerged(true);
+                        score += grid[writePos - 1][col].getValue();
+                        
+                        if (grid[writePos - 1][col].getValue() == 2048) {
+                            hasWon = true;
+                        }
+                        
+                        grid[row][col] = null;
+                        moved = true;
+                    } else {
+                        if (row != writePos) {
+                            grid[writePos][col] = current;
+                            grid[row][col] = null;
+                            moved = true;
+                        }
+                        writePos++;
+                    }
+                }
+            }
+        }
+        
+        return moved;
+    }
+    
+    private boolean moveDown() {
+        boolean moved = false;
+        
+        for (int col = 0; col < size; col++) {
+            int writePos = size - 1;
+            
+            for (int row = size - 1; row >= 0; row--) {
+                if (grid[row][col] != null) {
+                    Tile current = grid[row][col];
+                    
+                    if (writePos < size - 1 && grid[writePos + 1][col] != null && 
+                        grid[writePos + 1][col].getValue() == current.getValue() && 
+                        !grid[writePos + 1][col].isMerged()) {
+                        
+                        grid[writePos + 1][col].doubleValue();
+                        grid[writePos + 1][col].setMerged(true);
+                        score += grid[writePos + 1][col].getValue();
+                        
+                        if (grid[writePos + 1][col].getValue() == 2048) {
+                            hasWon = true;
+                        }
+                        
+                        grid[row][col] = null;
+                        moved = true;
+                    } else {
+                        if (row != writePos) {
+                            grid[writePos][col] = current;
+                            grid[row][col] = null;
+                            moved = true;
+                        }
+                        writePos--;
+                    }
+                }
+            }
         }
         
         return moved;
@@ -84,167 +175,146 @@ public class Board {
     
     private boolean moveLeft() {
         boolean moved = false;
-        for (int i = 0; i < size; i++) {
-            int[] row = grid[i];
-            int[] newRow = mergeLine(row);
-            grid[i] = newRow;
-            if (!arraysEqual(row, newRow)) {
-                moved = true;
+        
+        for (int row = 0; row < size; row++) {
+            int writePos = 0;
+            
+            for (int col = 0; col < size; col++) {
+                if (grid[row][col] != null) {
+                    Tile current = grid[row][col];
+                    
+                    if (writePos > 0 && grid[row][writePos - 1] != null && 
+                        grid[row][writePos - 1].getValue() == current.getValue() && 
+                        !grid[row][writePos - 1].isMerged()) {
+                        
+                        grid[row][writePos - 1].doubleValue();
+                        grid[row][writePos - 1].setMerged(true);
+                        score += grid[row][writePos - 1].getValue();
+                        
+                        if (grid[row][writePos - 1].getValue() == 2048) {
+                            hasWon = true;
+                        }
+                        
+                        grid[row][col] = null;
+                        moved = true;
+                    } else {
+                        if (col != writePos) {
+                            grid[row][writePos] = current;
+                            grid[row][col] = null;
+                            moved = true;
+                        }
+                        writePos++;
+                    }
+                }
             }
         }
+        
         return moved;
     }
     
     private boolean moveRight() {
         boolean moved = false;
-        for (int i = 0; i < size; i++) {
-            int[] row = grid[i];
-            int[] reversed = reverse(row);
-            int[] merged = mergeLine(reversed);
-            int[] newRow = reverse(merged);
-            grid[i] = newRow;
-            if (!arraysEqual(row, newRow)) {
-                moved = true;
+        
+        for (int row = 0; row < size; row++) {
+            int writePos = size - 1;
+            
+            for (int col = size - 1; col >= 0; col--) {
+                if (grid[row][col] != null) {
+                    Tile current = grid[row][col];
+                    
+                    if (writePos < size - 1 && grid[row][writePos + 1] != null && 
+                        grid[row][writePos + 1].getValue() == current.getValue() && 
+                        !grid[row][writePos + 1].isMerged()) {
+                        
+                        grid[row][writePos + 1].doubleValue();
+                        grid[row][writePos + 1].setMerged(true);
+                        score += grid[row][writePos + 1].getValue();
+                        
+                        if (grid[row][writePos + 1].getValue() == 2048) {
+                            hasWon = true;
+                        }
+                        
+                        grid[row][col] = null;
+                        moved = true;
+                    } else {
+                        if (col != writePos) {
+                            grid[row][writePos] = current;
+                            grid[row][col] = null;
+                            moved = true;
+                        }
+                        writePos--;
+                    }
+                }
             }
         }
+        
         return moved;
     }
     
-    private boolean moveUp() {
-        transpose();
-        boolean moved = moveLeft();
-        transpose();
-        return moved;
-    }
-    
-    private boolean moveDown() {
-        transpose();
-        boolean moved = moveRight();
-        transpose();
-        return moved;
-    }
-    
-    private int[] mergeLine(int[] line) {
-        int[] result = new int[size];
-        int position = 0;
-        
-        // Move all non-zero values to the left
-        for (int i = 0; i < size; i++) {
-            if (line[i] != 0) {
-                result[position++] = line[i];
+    public boolean isGameOver() {
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                if (grid[row][col] == null) {
+                    return false;
+                }
+                
+                if (col < size - 1 && grid[row][col + 1] != null && 
+                    grid[row][col].getValue() == grid[row][col + 1].getValue()) {
+                    return false;
+                }
+                
+                if (row < size - 1 && grid[row + 1][col] != null && 
+                    grid[row][col].getValue() == grid[row + 1][col].getValue()) {
+                    return false;
+                }
             }
         }
         
-        // Merge adjacent equal values
-        for (int i = 0; i < size - 1; i++) {
-            if (result[i] != 0 && result[i] == result[i + 1]) {
-                result[i] *= 2;
-                lastMoveScore += result[i]; 
-                result[i + 1] = 0;
-            }
-        }
-        
-        // Move non-zero values to the left again
-        int[] finalResult = new int[size];
-        position = 0;
-        for (int i = 0; i < size; i++) {
-            if (result[i] != 0) {
-                finalResult[position++] = result[i];
-            }
-        }
-        
-        return finalResult;
-    }
-    
-    private void transpose() {
-        for (int i = 0; i < size; i++) {
-            for (int j = i + 1; j < size; j++) {
-                int temp = grid[i][j];
-                grid[i][j] = grid[j][i];
-                grid[j][i] = temp;
-            }
-        }
-    }
-    
-    private int[] reverse(int[] array) {
-        int[] result = new int[array.length];
-        for (int i = 0; i < array.length; i++) {
-            result[i] = array[array.length - 1 - i];
-        }
-        return result;
-    }
-    
-    private boolean arraysEqual(int[] a, int[] b) {
-        for (int i = 0; i < a.length; i++) {
-            if (a[i] != b[i]) return false;
-        }
         return true;
     }
     
-    public int[][] getGrid() {
-        return grid;
+    public boolean canMove(int direction) {
+        Board testBoard = this.copy();
+        return testBoard.move(direction);
     }
     
-    public int[][] copyGrid(int[][] source) {
-        int[][] copy = new int[size][size];
-        for (int i = 0; i < size; i++) {
-            System.arraycopy(source[i], 0, copy[i], 0, size);
+    public Board copy() {
+        Board copy = new Board(this.size);
+        copy.score = this.score;
+        copy.hasWon = this.hasWon;
+        
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                if (this.grid[row][col] != null) {
+                    copy.grid[row][col] = this.grid[row][col].copy();
+                }
+            }
         }
+        
         return copy;
     }
     
-    public void setGrid(int[][] newGrid) {
-        this.grid = copyGrid(newGrid);
-    }
-    
-    public boolean hasEmptyTile() {
-        return !getEmptyPositions().isEmpty();
-    }
-    
-    public boolean canMove() {
-        // Check if there are empty tiles
-        if (hasEmptyTile()) {
-            return true;
-        }
-        
-        // Check if adjacent tiles can merge
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                int current = grid[i][j];
-                // Check right
-                if (j < size - 1 && current == grid[i][j + 1]) {
-                    return true;
-                }
-                // Check down
-                if (i < size - 1 && current == grid[i + 1][j]) {
-                    return true;
+    public int getHighestTile() {
+        int highest = 0;
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                if (grid[row][col] != null && grid[row][col].getValue() > highest) {
+                    highest = grid[row][col].getValue();
                 }
             }
         }
-        return false;
+        return highest;
     }
     
-    public int getLargestValue() {
-        int max = 0;
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (grid[i][j] > max) {
-                    max = grid[i][j];
+    public int getEmptyCellCount() {
+        int count = 0;
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                if (grid[row][col] == null) {
+                    count++;
                 }
             }
         }
-        return max;
-    }
-    
-    public int getSize() {
-        return size;
-    }
-    
-    public void reset() {
-        initializeBoard();
-    }
-
-    public int getLastMoveScore() {
-        return lastMoveScore;
+        return count;
     }
 }

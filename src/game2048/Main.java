@@ -1,11 +1,12 @@
 package game2048;
 
+import javax.swing.*;
+
 public class Main {
     public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                new SplashScreen();
-            }
+        SwingUtilities.invokeLater(() -> {
+            Game game = new Game();
+            game.setVisible(true);
         });
     }
 }
