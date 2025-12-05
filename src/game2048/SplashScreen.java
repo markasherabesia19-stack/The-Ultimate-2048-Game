@@ -56,10 +56,10 @@ public class SplashScreen extends JPanel {
         });
     }
     
+    // Loading splash screen
     private void loadImages() {
         try {
             splashImage = ImageIO.read(new File("components/images/splashscreen.png"));
-            // Not loading button image - using code-generated button instead
         } catch (Exception e) {
             System.out.println("Could not load images: " + e.getMessage());
         }
@@ -73,7 +73,7 @@ public class SplashScreen extends JPanel {
     }
     
     private void setupButtons() {
-        // Shorter, nicer button that fits perfectly with the splash screen
+        // Adjusted for all the buttons fit
         newGameButtonBounds = new Rectangle(410, 510, 300, 55);
     }
     
@@ -151,7 +151,6 @@ public class SplashScreen extends JPanel {
         Composite oldComposite = g2d.getComposite();
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, buttonAlpha));
         
-        // Nice code-generated button with gradient and shadow
         // Button shadow for depth
         g2d.setColor(new Color(0, 0, 0, 100));
         g2d.fillRoundRect(newGameButtonBounds.x + 4, newGameButtonBounds.y + 4, 

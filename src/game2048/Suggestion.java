@@ -9,7 +9,7 @@ public class Suggestion {
         
         int bestDirection = -1;
         int bestScore = -1;
-        String[] directionNames = {"UP ↑", "DOWN ↓", "LEFT ←", "RIGHT →"};
+        String[] directionNames = {"UP ", "DOWN ", "LEFT ", "RIGHT "};
         
         for (int direction = 0; direction < 4; direction++) {
             Board testBoard = board.copy();

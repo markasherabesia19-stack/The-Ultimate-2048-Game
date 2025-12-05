@@ -78,7 +78,6 @@ public class GameplayScreen extends JPanel {
     private void loadImages() {
         try {
             backgroundImage = ImageIO.read(new File("components/images/background.png"));
-            // Not using suggestion box or button images - using code-generated versions
         } catch (Exception e) {
             System.out.println("Could not load background image: " + e.getMessage());
         }
@@ -107,10 +106,8 @@ public class GameplayScreen extends JPanel {
     
     private void setupButtons() {
         // Move everything left by about 35 pixels for better balance
-        // Suggestion button - better positioned
-        suggestionButtonBounds = new Rectangle(615, 390, 380, 60);
-        // New Game button below suggestion
-        newGameButtonBounds = new Rectangle(615, 470, 380, 60);
+        suggestionButtonBounds = new Rectangle(615, 420, 380, 60);
+        newGameButtonBounds = new Rectangle(615, 500, 380, 60);
     }
     
     private void setupKeyListener() {
@@ -146,8 +143,19 @@ public class GameplayScreen extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (suggestionButtonBounds.contains(e.getPoint())) {
-                    suggestionText = game.getSuggestion();
+                    suggestionText = "Analyzing board... Calculating best move...";
                     repaint();
+                    
+                    // Calculate in background thread to avoid UI freeze
+                    new Thread(() -> {
+                        String suggestion = game.getSuggestion();
+               
+                        SwingUtilities.invokeLater(() -> {
+                            suggestionText = suggestion;
+                            repaint();
+                        });
+                    }).start();
+                    
                 } else if (newGameButtonBounds.contains(e.getPoint())) {
                     int choice = JOptionPane.showConfirmDialog(
                         GameplayScreen.this,
@@ -157,6 +165,8 @@ public class GameplayScreen extends JPanel {
                     );
                     if (choice == JOptionPane.YES_OPTION) {
                         game.startNewGame();
+                        suggestionText = "Press for suggestion";
+                        repaint();
                     }
                 }
             }
@@ -190,15 +200,11 @@ public class GameplayScreen extends JPanel {
     }
     
     private void drawBackground(Graphics2D g2d) {
-        // First draw a base color
         g2d.setColor(new Color(10, 10, 30));
         g2d.fillRect(0, 0, 1120, 630);
-        
-        // Then draw the background image on top if available
         if (backgroundImage != null) {
             g2d.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
         } else {
-            // Fallback gradient if image not found
             GradientPaint gradient = new GradientPaint(
                 0, 0, new Color(10, 10, 50),
                 0, 630, new Color(60, 20, 80)
@@ -209,7 +215,6 @@ public class GameplayScreen extends JPanel {
     }
     
     private void drawHeader(Graphics2D g2d) {
-        // Score with glow effect
         g2d.setFont(new Font("Arial", Font.BOLD, 32));
         
         // Glow effect
@@ -313,16 +318,15 @@ public class GameplayScreen extends JPanel {
     }
     
     private void drawSidePanel(Graphics2D g2d) {
-        // Suggestion box with animated glow - moved left by 35 pixels for better balance
         g2d.setColor(new Color(120, 80, 220, (int)(50 + pulseAlpha * 100)));
-        g2d.fillRoundRect(563, 97, 484, 266, 22, 22);
+        g2d.fillRoundRect(563, 97, 484, 310, 22, 22);
         
         g2d.setColor(new Color(60, 40, 100, 220));
-        g2d.fillRoundRect(565, 99, 480, 260, 20, 20);
+        g2d.fillRoundRect(565, 99, 480, 306, 20, 20);
         
         g2d.setColor(new Color(150, 120, 255, (int)(150 + pulseAlpha * 100)));
         g2d.setStroke(new BasicStroke(3));
-        g2d.drawRoundRect(565, 99, 480, 260, 20, 20);
+        g2d.drawRoundRect(565, 99, 480, 306, 20, 20);
         
         // Suggestion title with glow
         g2d.setFont(new Font("Arial", Font.BOLD, 26));
@@ -340,8 +344,8 @@ public class GameplayScreen extends JPanel {
         g2d.drawString(title, titleX, 140);
         
         // Suggestion text
-        g2d.setFont(new Font("Arial", Font.PLAIN, 18));
-        drawWrappedText(g2d, suggestionText, 585, 180, 440, 24);
+        g2d.setFont(new Font("Arial", Font.PLAIN, 16));
+        drawWrappedText(g2d, suggestionText, 585, 175, 440, 22);
         
         // Suggestion button
         drawStyledButton(g2d, suggestionButtonBounds, "GET SUGGESTION");

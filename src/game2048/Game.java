@@ -7,6 +7,7 @@ public class Game extends JFrame {
     private SplashScreen splashScreen;
     private GameplayScreen gameplayScreen;
     private Board board;
+    private Expictimax ex;
     private int score;
     private long startTime;
     private boolean gameStarted;
@@ -33,6 +34,7 @@ public class Game extends JFrame {
     
     public void startNewGame() {
         board = new Board(5);
+        ex = new Expictimax(board);
         score = 0;
         startTime = System.currentTimeMillis();
         gameStarted = true;
@@ -54,6 +56,7 @@ public class Game extends JFrame {
     public void returnToMainMenu() {
         gameStarted = false;
         board = null;
+        ex = null;
         score = 0;
         showSplashScreen();
     }
@@ -85,8 +88,13 @@ public class Game extends JFrame {
     }
     
     public String getSuggestion() {
-        if (!gameStarted || board == null) return "No suggestion available";
-        return Suggestion.getBestMove(board);
+        if (!gameStarted || board == null) {
+            return "No suggestion available";
+        }
+        
+        ex = new Expictimax(board);
+        
+        return ex.getBestMoveSequence(8);
     }
     
     private void gameOver() {
