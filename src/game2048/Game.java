@@ -7,10 +7,15 @@ public class Game extends JFrame {
     private SplashScreen splashScreen;
     private GameplayScreen gameplayScreen;
     private Board board;
-    private Expictimax ex;
+    private ImprovedExpectimax improvedAI;
     private int score;
     private long startTime;
     private boolean gameStarted;
+    
+    // Auto-suggest mode variables
+    private boolean autoSuggestMode = false;
+    private int remainingSuggestions = 0;
+    private static final int TOTAL_AUTO_SUGGESTIONS = 8;
     
     public Game() {
         setTitle("THE ULTIMATE 2048 GAME");
@@ -34,10 +39,12 @@ public class Game extends JFrame {
     
     public void startNewGame() {
         board = new Board(5);
-        ex = new Expictimax(board);
+        improvedAI = new ImprovedExpectimax(board);
         score = 0;
         startTime = System.currentTimeMillis();
         gameStarted = true;
+        autoSuggestMode = false;
+        remainingSuggestions = 0;
         
         board.addRandomTile();
         board.addRandomTile();
@@ -56,8 +63,10 @@ public class Game extends JFrame {
     public void returnToMainMenu() {
         gameStarted = false;
         board = null;
-        ex = null;
+        improvedAI = null;
         score = 0;
+        autoSuggestMode = false;
+        remainingSuggestions = 0;
         showSplashScreen();
     }
     
@@ -69,6 +78,25 @@ public class Game extends JFrame {
         if (moved) {
             board.addRandomTile();
             updateScore();
+            
+            // If auto-suggest mode is active, decrease counter
+            if (autoSuggestMode && remainingSuggestions > 0) {
+                remainingSuggestions--;
+                
+                // If still have remaining suggestions, auto-update
+                if (remainingSuggestions > 0) {
+                    // Trigger auto-suggestion update in the UI
+                    if (gameplayScreen != null) {
+                        gameplayScreen.updateAutoSuggestion();
+                    }
+                } else {
+                    // Auto-suggest mode completed
+                    autoSuggestMode = false;
+                    if (gameplayScreen != null) {
+                        gameplayScreen.showCompletionMessage();
+                    }
+                }
+            }
             
             if (board.isGameOver()) {
                 gameOver();
@@ -87,17 +115,82 @@ public class Game extends JFrame {
         }
     }
     
+    /**
+     * Activates auto-suggest mode for 8 consecutive moves
+     */
+    public void activateAutoSuggestMode() {
+        if (!gameStarted || board == null) return;
+        
+        autoSuggestMode = true;
+        remainingSuggestions = TOTAL_AUTO_SUGGESTIONS;
+        
+        // Trigger first suggestion immediately
+        if (gameplayScreen != null) {
+            gameplayScreen.updateAutoSuggestion();
+        }
+    }
+    
+    /**
+     * Gets current suggestion (simplified and clean)
+     */
     public String getSuggestion() {
         if (!gameStarted || board == null) {
             return "No suggestion available";
         }
         
-        ex = new Expictimax(board);
+        // Create fresh AI instance with current board state
+        improvedAI = new ImprovedExpectimax(board);
         
-        return ex.getBestMoveSequence(8);
+        if (autoSuggestMode) {
+            // In auto-suggest mode, show simple move suggestion
+            var topMoves = improvedAI.getTopMoves();
+            
+            if (topMoves.isEmpty()) {
+                autoSuggestMode = false;
+                return "No valid moves available!";
+            }
+            
+            var bestMove = topMoves.get(0);
+            
+            // SIMPLE FORMAT - Just the move number and direction
+            StringBuilder sb = new StringBuilder();
+            sb.append("🤖 AI COACH ACTIVE\n\n");
+            sb.append("Move ").append(TOTAL_AUTO_SUGGESTIONS - remainingSuggestions + 1);
+            sb.append(" of ").append(TOTAL_AUTO_SUGGESTIONS).append("\n\n");
+            sb.append("SUGGESTED MOVE:\n");
+            sb.append("👉 ").append(bestMove.directionName).append("\n\n");
+            sb.append(remainingSuggestions).append(" suggestions remaining");
+            
+            return sb.toString();
+        } else {
+            // Normal mode - show activation message
+            return "CLICK TO ACTIVATE\n\n" +
+                   "🤖 Auto-Suggest Mode\n\n" +
+                   "Get 8 consecutive smart\n" +
+                   "move suggestions!\n\n" +
+                   "The AI will guide you\n" +
+                   "through 8 moves.\n\n" +
+                   "Click to start! 🎮";
+        }
+    }
+    
+    /**
+     * Check if auto-suggest mode is currently active
+     */
+    public boolean isAutoSuggestActive() {
+        return autoSuggestMode;
+    }
+    
+    /**
+     * Manually deactivate auto-suggest mode
+     */
+    public void deactivateAutoSuggestMode() {
+        autoSuggestMode = false;
+        remainingSuggestions = 0;
     }
     
     private void gameOver() {
+        autoSuggestMode = false;
         JOptionPane.showMessageDialog(this, 
             "Game Over! Your score: " + score, 
             "Game Over", 
