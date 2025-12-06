@@ -7,7 +7,7 @@ public class Game extends JFrame {
     private SplashScreen splashScreen;
     private GameplayScreen gameplayScreen;
     private Board board;
-    private ImprovedExpectimax improvedAI;
+    private ImprovedExpectimax improvedEX; 
     private int score;
     private long startTime;
     private boolean gameStarted;
@@ -37,9 +37,16 @@ public class Game extends JFrame {
         repaint();
     }
     
+    public void showInstructions() {
+        Instructions instructions = new Instructions(this);
+        setContentPane(instructions);
+        revalidate();
+        repaint();
+    }
+    
     public void startNewGame() {
         board = new Board(5);
-        improvedAI = new ImprovedExpectimax(board);
+        improvedEX = new ImprovedExpectimax(board);
         score = 0;
         startTime = System.currentTimeMillis();
         gameStarted = true;
@@ -63,7 +70,7 @@ public class Game extends JFrame {
     public void returnToMainMenu() {
         gameStarted = false;
         board = null;
-        improvedAI = null;
+        improvedEX = null; 
         score = 0;
         autoSuggestMode = false;
         remainingSuggestions = 0;
@@ -115,9 +122,7 @@ public class Game extends JFrame {
         }
     }
     
-    /**
-     * Activates auto-suggest mode for 8 consecutive moves
-     */
+    // Activates auto-suggest mode for 8 consecutive moves
     public void activateAutoSuggestMode() {
         if (!gameStarted || board == null) return;
         
@@ -130,20 +135,18 @@ public class Game extends JFrame {
         }
     }
     
-    /**
-     * Gets current suggestion (simplified and clean)
-     */
+    // Gets current suggestion (simplified and clean)
     public String getSuggestion() {
         if (!gameStarted || board == null) {
             return "No suggestion available";
         }
         
-        // Create fresh AI instance with current board state
-        improvedAI = new ImprovedExpectimax(board);
+        // Create fresh Suggestion instance with current board state
+        improvedEX = new ImprovedExpectimax(board);
         
         if (autoSuggestMode) {
             // In auto-suggest mode, show simple move suggestion
-            var topMoves = improvedAI.getTopMoves();
+            var topMoves = improvedEX.getTopMoves();
             
             if (topMoves.isEmpty()) {
                 autoSuggestMode = false;
@@ -152,9 +155,9 @@ public class Game extends JFrame {
             
             var bestMove = topMoves.get(0);
             
-            // SIMPLE FORMAT - Just the move number and direction
+            // Simple format - Just the move number and direction
             StringBuilder sb = new StringBuilder();
-            sb.append("🤖 AI COACH ACTIVE\n\n");
+            sb.append("SUGGESTION\n\n");
             sb.append("Move ").append(TOTAL_AUTO_SUGGESTIONS - remainingSuggestions + 1);
             sb.append(" of ").append(TOTAL_AUTO_SUGGESTIONS).append("\n\n");
             sb.append("SUGGESTED MOVE:\n");
@@ -165,25 +168,21 @@ public class Game extends JFrame {
         } else {
             // Normal mode - show activation message
             return "CLICK TO ACTIVATE\n\n" +
-                   "🤖 Auto-Suggest Mode\n\n" +
+                   "Auto-Suggest Mode\n\n" +
                    "Get 8 consecutive smart\n" +
                    "move suggestions!\n\n" +
-                   "The AI will guide you\n" +
+                   "The Algo will guide you\n" +
                    "through 8 moves.\n\n" +
-                   "Click to start! 🎮";
+                   "Click to start!";
         }
     }
     
-    /**
-     * Check if auto-suggest mode is currently active
-     */
+    // Check if auto-suggest mode is currently active
     public boolean isAutoSuggestActive() {
         return autoSuggestMode;
     }
     
-    /**
-     * Manually deactivate auto-suggest mode
-     */
+    // Manually deactivate auto-suggest mode
     public void deactivateAutoSuggestMode() {
         autoSuggestMode = false;
         remainingSuggestions = 0;
@@ -199,14 +198,19 @@ public class Game extends JFrame {
     }
     
     private void victory() {
-        int choice = JOptionPane.showConfirmDialog(this,
-            "You reached 2048! Continue playing?",
-            "Victory!",
-            JOptionPane.YES_NO_OPTION);
+        autoSuggestMode = false; // Stop auto-suggest when won
         
-        if (choice == JOptionPane.NO_OPTION) {
-            returnToMainMenu();
-        }
+        // Show congratulations message
+        JOptionPane.showMessageDialog(this,
+            "-- CONGRATULATIONS! --\n\n" +
+            "You reached 2048!\n" +
+            "Final Score: " + score + "\n\n" +
+            "You are a 2048 Master!",
+            "-- VICTORY! --",
+            JOptionPane.INFORMATION_MESSAGE);
+        
+        // Return to main menu after victory
+        returnToMainMenu();
     }
     
     public int getScore() {

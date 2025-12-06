@@ -166,7 +166,7 @@ public class GameplayScreen extends JPanel {
     
     private void handleSuggestionClick() {
         if (!game.isAutoSuggestActive()) {
-            suggestionText = "🤖 Activating AI Coach...";
+            suggestionText = "Activating Suggestion...";
             repaint();
             
             new Thread(() -> {
@@ -197,7 +197,7 @@ public class GameplayScreen extends JPanel {
     }
     
     public void showCompletionMessage() {
-        suggestionText = "✅ AI COACH COMPLETE!\n\n" +
+        suggestionText = "SUGGESTION COMPLETE!\n\n" +
                         "All 8 suggestions used.\n\n" +
                         "Great job!\n\n" +
                         "Click to start again.";
@@ -329,8 +329,6 @@ public class GameplayScreen extends JPanel {
             case 512: return new Color(90, 50, 180);
             case 1024: return new Color(110, 50, 190);
             case 2048: return new Color(128, 0, 128);
-            case 4096: return new Color(148, 0, 211);
-            case 8192: return new Color(138, 43, 226);
             default: return new Color(186, 85, 211);
         }
     }
@@ -357,7 +355,7 @@ public class GameplayScreen extends JPanel {
         g2d.setStroke(new BasicStroke(3));
         g2d.drawRoundRect(565, 99, 480, 306, 20, 20);
         
-        String title = game.isAutoSuggestActive() ? "🤖 AI COACH ACTIVE" : "SUGGESTION";
+        String title = "SUGGESTION";
         g2d.setFont(new Font("Arial", Font.BOLD, 24));
         FontMetrics fm = g2d.getFontMetrics();
         int titleX = 565 + (480 - fm.stringWidth(title)) / 2;

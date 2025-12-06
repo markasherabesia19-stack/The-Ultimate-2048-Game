@@ -10,7 +10,6 @@ import java.io.File;
 public class SplashScreen extends JPanel {
     private Game game;
     private Image splashImage;
-    private Image newGameButtonImage;
     private float titleAlpha = 0f;
     private float buttonAlpha = 0f;
     private Timer animationTimer;
@@ -18,6 +17,7 @@ public class SplashScreen extends JPanel {
     private Star[] stars;
     
     private Rectangle newGameButtonBounds;
+    private Rectangle howToPlayButtonBounds;
     
     class Star {
         float x, y, size, speed, alpha;
@@ -51,17 +51,18 @@ public class SplashScreen extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (newGameButtonBounds.contains(e.getPoint())) {
                     game.startNewGame();
+                } else if (howToPlayButtonBounds.contains(e.getPoint())) {
+                    game.showInstructions();
                 }
             }
         });
     }
     
-    // Loading splash screen
     private void loadImages() {
         try {
             splashImage = ImageIO.read(new File("components/images/splashscreen.png"));
         } catch (Exception e) {
-            System.out.println("Could not load images: " + e.getMessage());
+            System.out.println("Could not load splash image: " + e.getMessage());
         }
     }
     
@@ -73,8 +74,16 @@ public class SplashScreen extends JPanel {
     }
     
     private void setupButtons() {
-        // Adjusted for all the buttons fit
-        newGameButtonBounds = new Rectangle(410, 510, 300, 55);
+        // Two buttons side by side
+        int buttonWidth = 280;
+        int buttonHeight = 55;
+        int buttonY = 510;
+        int spacing = 40;
+        int totalWidth = (buttonWidth * 2) + spacing;
+        int startX = (1120 - totalWidth) / 2;
+        
+        newGameButtonBounds = new Rectangle(startX, buttonY, buttonWidth, buttonHeight);
+        howToPlayButtonBounds = new Rectangle(startX + buttonWidth + spacing, buttonY, buttonWidth, buttonHeight);
     }
     
     private void startAnimations() {
@@ -102,7 +111,7 @@ public class SplashScreen extends JPanel {
         drawBackground(g2d);
         drawStars(g2d);
         drawTitle(g2d);
-        drawButton(g2d);
+        drawButtons(g2d);
     }
     
     private void drawBackground(Graphics2D g2d) {
@@ -126,7 +135,6 @@ public class SplashScreen extends JPanel {
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, titleAlpha));
         
         if (splashImage != null) {
-            // Full screen title image
             g2d.drawImage(splashImage, 0, 0, 1120, 630, null);
         } else {
             // Fallback text rendering
@@ -147,39 +155,43 @@ public class SplashScreen extends JPanel {
         g2d.setComposite(oldComposite);
     }
     
-    private void drawButton(Graphics2D g2d) {
+    private void drawButtons(Graphics2D g2d) {
         Composite oldComposite = g2d.getComposite();
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, buttonAlpha));
         
+        // Draw NEW GAME button (left)
+        drawButton(g2d, newGameButtonBounds, "NEW GAME", new Color(70, 100, 200));
+        
+        // Draw HOW TO PLAY button (right)
+        drawButton(g2d, howToPlayButtonBounds, "HOW TO PLAY", new Color(70, 100, 200));
+        
+        g2d.setComposite(oldComposite);
+    }
+    
+    private void drawButton(Graphics2D g2d, Rectangle bounds, String text, Color baseColor) {
         // Button shadow for depth
         g2d.setColor(new Color(0, 0, 0, 100));
-        g2d.fillRoundRect(newGameButtonBounds.x + 4, newGameButtonBounds.y + 4, 
-                         newGameButtonBounds.width, newGameButtonBounds.height, 35, 35);
+        g2d.fillRoundRect(bounds.x + 4, bounds.y + 4, bounds.width, bounds.height, 35, 35);
         
         // Button background with gradient
         GradientPaint buttonGradient = new GradientPaint(
-            newGameButtonBounds.x, newGameButtonBounds.y, new Color(100, 70, 200),
-            newGameButtonBounds.x, newGameButtonBounds.y + newGameButtonBounds.height, new Color(70, 50, 170)
+            bounds.x, bounds.y, baseColor,
+            bounds.x, bounds.y + bounds.height, new Color(baseColor.getRed() - 30, baseColor.getGreen() - 30, baseColor.getBlue() - 30)
         );
         g2d.setPaint(buttonGradient);
-        g2d.fillRoundRect(newGameButtonBounds.x, newGameButtonBounds.y, 
-                         newGameButtonBounds.width, newGameButtonBounds.height, 35, 35);
+        g2d.fillRoundRect(bounds.x, bounds.y, bounds.width, bounds.height, 35, 35);
         
         // Button border
-        g2d.setColor(new Color(130, 100, 230));
+        g2d.setColor(new Color(baseColor.getRed() + 30, baseColor.getGreen() + 30, baseColor.getBlue() + 30));
         g2d.setStroke(new BasicStroke(3));
-        g2d.drawRoundRect(newGameButtonBounds.x, newGameButtonBounds.y, 
-                         newGameButtonBounds.width, newGameButtonBounds.height, 35, 35);
+        g2d.drawRoundRect(bounds.x, bounds.y, bounds.width, bounds.height, 35, 35);
         
         // Button text
         g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Arial", Font.BOLD, 38));
+        g2d.setFont(new Font("Arial", Font.BOLD, 28));
         FontMetrics fm = g2d.getFontMetrics();
-        String text = "NEW GAME";
-        int textX = newGameButtonBounds.x + (newGameButtonBounds.width - fm.stringWidth(text)) / 2;
-        int textY = newGameButtonBounds.y + ((newGameButtonBounds.height - fm.getHeight()) / 2) + fm.getAscent();
+        int textX = bounds.x + (bounds.width - fm.stringWidth(text)) / 2;
+        int textY = bounds.y + ((bounds.height - fm.getHeight()) / 2) + fm.getAscent();
         g2d.drawString(text, textX, textY);
-        
-        g2d.setComposite(oldComposite);
     }
 }

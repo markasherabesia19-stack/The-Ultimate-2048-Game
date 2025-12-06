@@ -145,7 +145,7 @@ public class ImprovedExpectimax {
         sb.append("TOP MOVES\n");
         sb.append("━━━━━━━━━━━━━━━━━━━━\n\n");
         
-        String[] medals = {"🥇 BEST", "🥈 GOOD", "🥉 OKAY"};
+        String[] medals = {"BEST", "GOOD", "OKAY"};
         
         for (int i = 0; i < topMoves.size(); i++) {
             MoveEvaluation eval = topMoves.get(i);
@@ -163,11 +163,11 @@ public class ImprovedExpectimax {
         if (topMoves.size() >= 2) {
             double scoreDiff = topMoves.get(0).score - topMoves.get(1).score;
             if (scoreDiff > 500) {
-                sb.append("💡 Best move is clearly superior!");
+                sb.append("Best move is clearly superior!");
             } else if (scoreDiff > 200) {
-                sb.append("💡 Best move is recommended");
+                sb.append("Best move is recommended");
             } else {
-                sb.append("💡 Multiple good options available");
+                sb.append("Multiple good options available");
             }
         }
         
