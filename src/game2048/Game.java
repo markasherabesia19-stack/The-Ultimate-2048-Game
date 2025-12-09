@@ -5,12 +5,14 @@ import java.awt.*;
 
 public class Game extends JFrame {
     private SplashScreen splashScreen;
+    private NameInputPanel nameInputPanel;
     private GameplayScreen gameplayScreen;
     private Board board;
     private ImprovedExpectimax improvedEX; 
     private int score;
     private long startTime;
     private boolean gameStarted;
+    private String playerName = "Player";
     
     // Auto-suggest mode variables
     private boolean autoSuggestMode = false;
@@ -44,6 +46,21 @@ public class Game extends JFrame {
         repaint();
     }
     
+    public void showNameInput() {
+        nameInputPanel = new NameInputPanel(this);
+        setContentPane(nameInputPanel);
+        revalidate();
+        repaint();
+    }
+    
+    public void setPlayerName(String name) {
+        this.playerName = name;
+    }
+    
+    public String getPlayerName() {
+        return playerName;
+    }
+    
     public void startNewGame() {
         board = new Board(5);
         improvedEX = new ImprovedExpectimax(board);
@@ -74,6 +91,7 @@ public class Game extends JFrame {
         score = 0;
         autoSuggestMode = false;
         remainingSuggestions = 0;
+        playerName = "Player";
         showSplashScreen();
     }
     
@@ -191,18 +209,18 @@ public class Game extends JFrame {
     private void gameOver() {
         autoSuggestMode = false;
         JOptionPane.showMessageDialog(this, 
-            "Game Over! Your score: " + score, 
+            "Game Over, " + playerName + "!\n\nYour score: " + score, 
             "Game Over", 
             JOptionPane.INFORMATION_MESSAGE);
         returnToMainMenu();
     }
     
     private void victory() {
-        autoSuggestMode = false; // Stop auto-suggest when won
+        autoSuggestMode = false;
         
         // Show congratulations message
         JOptionPane.showMessageDialog(this,
-            "-- CONGRATULATIONS! --\n\n" +
+            "-- CONGRATULATIONS " + playerName.toUpperCase() + "! --\n\n" +
             "You reached 2048!\n" +
             "Final Score: " + score + "\n\n" +
             "You are a 2048 Master!",

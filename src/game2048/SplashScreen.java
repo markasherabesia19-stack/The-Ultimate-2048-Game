@@ -50,7 +50,7 @@ public class SplashScreen extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (newGameButtonBounds.contains(e.getPoint())) {
-                    game.startNewGame();
+                    game.showNameInput();
                 } else if (howToPlayButtonBounds.contains(e.getPoint())) {
                     game.showInstructions();
                 }
