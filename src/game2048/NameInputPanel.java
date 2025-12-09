@@ -53,7 +53,7 @@ public class NameInputPanel extends JPanel {
     
     private void loadImages() {
         try {
-            nameImage = ImageIO.read(new File("components/images/name.png"));
+            nameImage = ImageIO.read(new File("components/images/name1.png"));
         } catch (Exception e) {
             System.out.println("Could not load name image: " + e.getMessage());
         }
