@@ -18,6 +18,7 @@ public class SplashScreen extends JPanel {
     
     private Rectangle newGameButtonBounds;
     private Rectangle howToPlayButtonBounds;
+    private Rectangle leaderboardButtonBounds;
     
     class Star {
         float x, y, size, speed, alpha;
@@ -44,15 +45,28 @@ public class SplashScreen extends JPanel {
         loadImages();
         initializeStars();
         setupButtons();
+        setupMouseListener();
         startAnimations();
-        
+    }
+    
+    private void setupMouseListener() {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                System.out.println("Mouse clicked at: " + e.getX() + ", " + e.getY());
+                System.out.println("New Game bounds: " + newGameButtonBounds);
+                System.out.println("How to Play bounds: " + howToPlayButtonBounds);
+                System.out.println("Leaderboard bounds: " + leaderboardButtonBounds);
+                
                 if (newGameButtonBounds.contains(e.getPoint())) {
+                    System.out.println("NEW GAME clicked!");
                     game.showNameInput();
                 } else if (howToPlayButtonBounds.contains(e.getPoint())) {
+                    System.out.println("HOW TO PLAY clicked!");
                     game.showInstructions();
+                } else if (leaderboardButtonBounds.contains(e.getPoint())) {
+                    System.out.println("LEADERBOARD clicked!");
+                    game.showLeaderboard();
                 }
             }
         });
@@ -74,16 +88,17 @@ public class SplashScreen extends JPanel {
     }
     
     private void setupButtons() {
-        // Two buttons side by side
-        int buttonWidth = 280;
+        // Three buttons in a row
+        int buttonWidth = 250;
         int buttonHeight = 55;
-        int buttonY = 510;
-        int spacing = 40;
-        int totalWidth = (buttonWidth * 2) + spacing;
+        int buttonY = 520;
+        int spacing = 30;
+        int totalWidth = (buttonWidth * 3) + (spacing * 2);
         int startX = (1120 - totalWidth) / 2;
         
         newGameButtonBounds = new Rectangle(startX, buttonY, buttonWidth, buttonHeight);
         howToPlayButtonBounds = new Rectangle(startX + buttonWidth + spacing, buttonY, buttonWidth, buttonHeight);
+        leaderboardButtonBounds = new Rectangle(startX + (buttonWidth + spacing) * 2, buttonY, buttonWidth, buttonHeight);
     }
     
     private void startAnimations() {
@@ -135,7 +150,12 @@ public class SplashScreen extends JPanel {
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, titleAlpha));
         
         if (splashImage != null) {
-            g2d.drawImage(splashImage, 0, 0, 1120, 630, null);
+            // Draw the image higher and expand proportionally to avoid distortion
+            int imgWidth = 1228; // Proportionally expanded width
+            int imgHeight = 690; // Expanded height to cover bottom when shifted
+            int imgX = (1120 - imgWidth) / 2; // Center horizontally
+            // Shift image up by 60 pixels to balance with buttons
+            g2d.drawImage(splashImage, imgX, -60, imgWidth, imgHeight, null);
         } else {
             // Fallback text rendering
             g2d.setFont(new Font("Arial", Font.BOLD, 80));
@@ -143,13 +163,13 @@ public class SplashScreen extends JPanel {
             String title = "THE ULTIMATE";
             FontMetrics fm = g2d.getFontMetrics();
             int x = (1120 - fm.stringWidth(title)) / 2;
-            g2d.drawString(title, x, 160);
+            g2d.drawString(title, x, 140);
             
             g2d.setFont(new Font("Arial", Font.BOLD, 110));
             String subtitle = "2048 GAME";
             fm = g2d.getFontMetrics();
             x = (1120 - fm.stringWidth(subtitle)) / 2;
-            g2d.drawString(subtitle, x, 290);
+            g2d.drawString(subtitle, x, 270);
         }
         
         g2d.setComposite(oldComposite);
@@ -162,8 +182,11 @@ public class SplashScreen extends JPanel {
         // Draw NEW GAME button (left)
         drawButton(g2d, newGameButtonBounds, "NEW GAME", new Color(70, 100, 200));
         
-        // Draw HOW TO PLAY button (right)
+        // Draw HOW TO PLAY button (center)
         drawButton(g2d, howToPlayButtonBounds, "HOW TO PLAY", new Color(70, 100, 200));
+        
+        // Draw LEADERBOARD button (right)
+        drawButton(g2d, leaderboardButtonBounds, "LEADERBOARD", new Color(70, 100, 200));
         
         g2d.setComposite(oldComposite);
     }
@@ -186,9 +209,10 @@ public class SplashScreen extends JPanel {
         g2d.setStroke(new BasicStroke(3));
         g2d.drawRoundRect(bounds.x, bounds.y, bounds.width, bounds.height, 35, 35);
         
-        // Button text
+        // Button text - adjust font size based on text length
+        int fontSize = text.length() > 10 ? 22 : 28;
         g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Arial", Font.BOLD, 28));
+        g2d.setFont(new Font("Arial", Font.BOLD, fontSize));
         FontMetrics fm = g2d.getFontMetrics();
         int textX = bounds.x + (bounds.width - fm.stringWidth(text)) / 2;
         int textY = bounds.y + ((bounds.height - fm.getHeight()) / 2) + fm.getAscent();

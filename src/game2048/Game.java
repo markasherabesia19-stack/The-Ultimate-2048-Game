@@ -45,6 +45,13 @@ public class Game extends JFrame {
         revalidate();
         repaint();
     }
+
+    public void showLeaderboard() {
+    JOptionPane.showMessageDialog(this,
+        "Leaderboard feature coming soon!\n\nThis will show the top players and their scores.",
+        "Leaderboard",
+        JOptionPane.INFORMATION_MESSAGE);
+}
     
     public void showNameInput() {
         nameInputPanel = new NameInputPanel(this);
