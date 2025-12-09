@@ -13,6 +13,7 @@ public class Game extends JFrame {
     private long startTime;
     private boolean gameStarted;
     private String playerName = "Player";
+    private MusicPlayer musicPlayer;
     
     // Auto-suggest mode variables
     private boolean autoSuggestMode = false;
@@ -29,6 +30,9 @@ public class Game extends JFrame {
         score = 0;
         gameStarted = false;
         
+        // Initialize music player
+        musicPlayer = new MusicPlayer();
+        
         showSplashScreen();
     }
     
@@ -37,6 +41,9 @@ public class Game extends JFrame {
         setContentPane(splashScreen);
         revalidate();
         repaint();
+        
+        // Play menu music
+        musicPlayer.playMenuMusic();
     }
     
     public void showInstructions() {
@@ -44,20 +51,24 @@ public class Game extends JFrame {
         setContentPane(instructions);
         revalidate();
         repaint();
+        
+        // Keep menu music playing (no change needed)
     }
 
     public void showLeaderboard() {
-    JOptionPane.showMessageDialog(this,
-        "Leaderboard feature coming soon!\n\nThis will show the top players and their scores.",
-        "Leaderboard",
-        JOptionPane.INFORMATION_MESSAGE);
-}
+        JOptionPane.showMessageDialog(this,
+            "Leaderboard feature coming soon!\n\nThis will show the top players and their scores.",
+            "Leaderboard",
+            JOptionPane.INFORMATION_MESSAGE);
+    }
     
     public void showNameInput() {
         nameInputPanel = new NameInputPanel(this);
         setContentPane(nameInputPanel);
         revalidate();
         repaint();
+        
+        // Keep menu music playing (no change needed)
     }
     
     public void setPlayerName(String name) {
@@ -81,6 +92,9 @@ public class Game extends JFrame {
         board.addRandomTile();
         
         showGameplayScreen();
+        
+        // Switch to gameplay music
+        musicPlayer.playGameplayMusic();
     }
     
     private void showGameplayScreen() {
@@ -99,7 +113,11 @@ public class Game extends JFrame {
         autoSuggestMode = false;
         remainingSuggestions = 0;
         playerName = "Player";
+        
         showSplashScreen();
+        
+        // Switch back to menu music
+        musicPlayer.playMenuMusic();
     }
     
     public boolean makeMove(int direction) {
@@ -249,5 +267,10 @@ public class Game extends JFrame {
     
     public Board getBoard() {
         return board;
+    }
+    
+    // Getter for music player
+    public MusicPlayer getMusicPlayer() {
+        return musicPlayer;
     }
 }
