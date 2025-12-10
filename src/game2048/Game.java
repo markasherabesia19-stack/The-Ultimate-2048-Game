@@ -56,10 +56,12 @@ public class Game extends JFrame {
     }
 
     public void showLeaderboard() {
-        JOptionPane.showMessageDialog(this,
-            "Leaderboard feature coming soon!\n\nThis will show the top players and their scores.",
-            "Leaderboard",
-            JOptionPane.INFORMATION_MESSAGE);
+        Leaderboard leaderboard = new Leaderboard(this);
+        setContentPane(leaderboard);
+        revalidate();
+        repaint();
+        
+        // Keep menu music playing (no change needed)
     }
     
     public void showNameInput() {
