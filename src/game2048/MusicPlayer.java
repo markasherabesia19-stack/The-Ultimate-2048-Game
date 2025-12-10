@@ -8,7 +8,7 @@ public class MusicPlayer {
     private Clip currentClip;
     private String currentTrack;
     private boolean isMuted = false;
-    private float volume = 0.7f; // 70% volume by default
+    private float volume = 0.9f; // 70% volume by defaultgit 
     
     // Music file paths - WAV FORMAT
     private static final String MENU_MUSIC = "components/music/Satellite.wav";

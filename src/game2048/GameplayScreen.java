@@ -15,6 +15,7 @@ public class GameplayScreen extends JPanel {
     private Rectangle suggestionButtonBounds;
     private Rectangle newGameButtonBounds;
     private Rectangle muteButtonBounds;
+    private Rectangle quitButtonBounds;
     private String suggestionText = "Click to activate Auto-Suggest";
     
     // Animation variables
@@ -106,6 +107,7 @@ public class GameplayScreen extends JPanel {
         suggestionButtonBounds = new Rectangle(615, 420, 380, 60);
         newGameButtonBounds = new Rectangle(615, 500, 380, 60);
         muteButtonBounds = new Rectangle(980, 20, 120, 50);
+        quitButtonBounds = new Rectangle(850, 20, 120, 50);
     }
     
     private void setupKeyListener() {
@@ -170,6 +172,17 @@ public class GameplayScreen extends JPanel {
                     // Toggle mute
                     game.getMusicPlayer().toggleMute();
                     repaint();
+                } else if (quitButtonBounds.contains(e.getPoint())) {
+                    // Quit button clicked
+                    int choice = JOptionPane.showConfirmDialog(
+                        GameplayScreen.this,
+                        "Quit to main menu? Current progress will be lost.",
+                        "Quit Game",
+                        JOptionPane.YES_NO_OPTION
+                    );
+                    if (choice == JOptionPane.YES_OPTION) {
+                        game.returnToMainMenu();
+                    }
                 }
             }
         });
@@ -234,6 +247,7 @@ public class GameplayScreen extends JPanel {
         drawSuggestionButton(g2d);
         drawNewGameButton(g2d);
         drawMuteButton(g2d);
+        drawQuitButton(g2d);
     }
     
     private void drawParticles(Graphics2D g2d) {
@@ -400,16 +414,27 @@ public class GameplayScreen extends JPanel {
         String buttonText = isMuted ? "🔇 MUTED" : "🔊 MUSIC";
         Color buttonColor = isMuted ? new Color(150, 50, 50) : new Color(70, 150, 70);
         
+        drawTopButton(g2d, muteButtonBounds, buttonText, buttonColor);
+    }
+    
+    private void drawQuitButton(Graphics2D g2d) {
+        String buttonText = "❌ QUIT";
+        Color buttonColor = new Color(200, 50, 50);
+        
+        drawTopButton(g2d, quitButtonBounds, buttonText, buttonColor);
+    }
+    
+    private void drawTopButton(Graphics2D g2d, Rectangle bounds, String text, Color buttonColor) {
         // Glow effect
         int glowAlpha = (int)(80 + pulseAlpha * 150);
         g2d.setColor(new Color(buttonColor.getRed(), buttonColor.getGreen(), buttonColor.getBlue(), glowAlpha));
-        g2d.fillRoundRect(muteButtonBounds.x - 2, muteButtonBounds.y - 2, 
-            muteButtonBounds.width + 4, muteButtonBounds.height + 4, 22, 22);
+        g2d.fillRoundRect(bounds.x - 2, bounds.y - 2, 
+            bounds.width + 4, bounds.height + 4, 22, 22);
         
         // Shadow
         g2d.setColor(new Color(0, 0, 0, 120));
-        g2d.fillRoundRect(muteButtonBounds.x + 3, muteButtonBounds.y + 3, 
-            muteButtonBounds.width, muteButtonBounds.height, 20, 20);
+        g2d.fillRoundRect(bounds.x + 3, bounds.y + 3, 
+            bounds.width, bounds.height, 20, 20);
         
         // Button gradient
         Color darkerColor = new Color(
@@ -419,43 +444,43 @@ public class GameplayScreen extends JPanel {
         );
         
         GradientPaint buttonGradient = new GradientPaint(
-            muteButtonBounds.x, muteButtonBounds.y, buttonColor,
-            muteButtonBounds.x, muteButtonBounds.y + muteButtonBounds.height, darkerColor
+            bounds.x, bounds.y, buttonColor,
+            bounds.x, bounds.y + bounds.height, darkerColor
         );
         g2d.setPaint(buttonGradient);
-        g2d.fillRoundRect(muteButtonBounds.x, muteButtonBounds.y, 
-            muteButtonBounds.width, muteButtonBounds.height, 20, 20);
+        g2d.fillRoundRect(bounds.x, bounds.y, 
+            bounds.width, bounds.height, 20, 20);
         
         // Shine effect
         GradientPaint shine = new GradientPaint(
-            muteButtonBounds.x, muteButtonBounds.y, new Color(255, 255, 255, 60),
-            muteButtonBounds.x, muteButtonBounds.y + muteButtonBounds.height / 2, 
+            bounds.x, bounds.y, new Color(255, 255, 255, 60),
+            bounds.x, bounds.y + bounds.height / 2, 
             new Color(255, 255, 255, 0)
         );
         g2d.setPaint(shine);
-        g2d.fillRoundRect(muteButtonBounds.x, muteButtonBounds.y, 
-            muteButtonBounds.width, muteButtonBounds.height / 2, 20, 20);
+        g2d.fillRoundRect(bounds.x, bounds.y, 
+            bounds.width, bounds.height / 2, 20, 20);
         
         // Border
         g2d.setColor(new Color(180, 150, 255, (int)(200 + pulseAlpha * 55)));
         g2d.setStroke(new BasicStroke(2));
-        g2d.drawRoundRect(muteButtonBounds.x, muteButtonBounds.y, 
-            muteButtonBounds.width, muteButtonBounds.height, 20, 20);
+        g2d.drawRoundRect(bounds.x, bounds.y, 
+            bounds.width, bounds.height, 20, 20);
         
         // Text
         g2d.setFont(new Font("Arial", Font.BOLD, 16));
         FontMetrics fm = g2d.getFontMetrics();
-        int textX = muteButtonBounds.x + (muteButtonBounds.width - fm.stringWidth(buttonText)) / 2;
-        int textY = muteButtonBounds.y + ((muteButtonBounds.height - fm.getHeight()) / 2) + fm.getAscent();
+        int textX = bounds.x + (bounds.width - fm.stringWidth(text)) / 2;
+        int textY = bounds.y + ((bounds.height - fm.getHeight()) / 2) + fm.getAscent();
         
         // Text shadow
         g2d.setColor(new Color(200, 180, 255, (int)(pulseAlpha * 200)));
-        g2d.drawString(buttonText, textX - 1, textY - 1);
-        g2d.drawString(buttonText, textX + 1, textY + 1);
+        g2d.drawString(text, textX - 1, textY - 1);
+        g2d.drawString(text, textX + 1, textY + 1);
         
         // Main text
         g2d.setColor(Color.WHITE);
-        g2d.drawString(buttonText, textX, textY);
+        g2d.drawString(text, textX, textY);
     }
     
     private void drawStyledButton(Graphics2D g2d, Rectangle bounds, String text, boolean isActive) {
