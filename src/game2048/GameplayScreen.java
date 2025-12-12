@@ -157,13 +157,12 @@ public class GameplayScreen extends JPanel {
                 if (suggestionButtonBounds.contains(e.getPoint())) {
                     handleSuggestionClick();
                 } else if (newGameButtonBounds.contains(e.getPoint())) {
-                    int choice = JOptionPane.showConfirmDialog(
-                        GameplayScreen.this,
-                        "Start a new game? Current progress will be lost.",
+                    boolean confirmed = CustomDialog.showConfirmDialog(
+                        (JFrame) SwingUtilities.getWindowAncestor(GameplayScreen.this),
                         "New Game",
-                        JOptionPane.YES_NO_OPTION
+                        "Start a new game? Current progress will be lost."
                     );
-                    if (choice == JOptionPane.YES_OPTION) {
+                    if (confirmed) {
                         game.startNewGame();
                         suggestionText = "Click to activate Auto-Suggest";
                         repaint();
@@ -173,14 +172,13 @@ public class GameplayScreen extends JPanel {
                     game.getMusicPlayer().toggleMute();
                     repaint();
                 } else if (quitButtonBounds.contains(e.getPoint())) {
-                    // Quit button clicked
-                    int choice = JOptionPane.showConfirmDialog(
-                        GameplayScreen.this,
-                        "Quit to main menu? Current progress will be lost.",
+                    // Quit button clicked with custom dialog
+                    boolean confirmed = CustomDialog.showConfirmDialog(
+                        (JFrame) SwingUtilities.getWindowAncestor(GameplayScreen.this),
                         "Quit Game",
-                        JOptionPane.YES_NO_OPTION
+                        "Quit to main menu? Current progress will be lost."
                     );
-                    if (choice == JOptionPane.YES_OPTION) {
+                    if (confirmed) {
                         game.returnToMainMenu();
                     }
                 }
