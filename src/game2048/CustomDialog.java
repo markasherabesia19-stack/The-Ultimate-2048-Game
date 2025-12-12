@@ -51,22 +51,22 @@ public class CustomDialog extends JDialog {
         // Icon
         JLabel iconLabel = new JLabel("⚠️");
         iconLabel.setFont(new Font("Arial", Font.BOLD, 48));
-        iconLabel.setBounds(30, 40, 60, 60);
+        iconLabel.setBounds(30, 30, 60, 60);
         contentPanel.add(iconLabel);
         
-        // Title
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        // Title - Centered
+        JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
         titleLabel.setForeground(new Color(255, 220, 100));
-        titleLabel.setBounds(100, 40, 330, 30);
+        titleLabel.setBounds(0, 35, 450, 35);
         contentPanel.add(titleLabel);
         
         // Message
         JLabel messageLabel = new JLabel("<html><center>" + message + "</center></html>");
-        messageLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        messageLabel.setFont(new Font("Arial", Font.BOLD, 18));
         messageLabel.setForeground(Color.WHITE);
         messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        messageLabel.setBounds(30, 85, 390, 60);
+        messageLabel.setBounds(30, 90, 390, 60);
         contentPanel.add(messageLabel);
         
         // YES button

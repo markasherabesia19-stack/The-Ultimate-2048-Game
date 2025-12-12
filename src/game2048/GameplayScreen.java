@@ -172,14 +172,14 @@ public class GameplayScreen extends JPanel {
                     game.getMusicPlayer().toggleMute();
                     repaint();
                 } else if (quitButtonBounds.contains(e.getPoint())) {
-                    // Quit button clicked with custom dialog
+                    // Quit button clicked - Exit the entire game
                     boolean confirmed = CustomDialog.showConfirmDialog(
                         (JFrame) SwingUtilities.getWindowAncestor(GameplayScreen.this),
                         "Quit Game",
-                        "Quit to main menu? Current progress will be lost."
+                        "Are you sure you want to quit? Current progress will be lost."
                     );
                     if (confirmed) {
-                        game.returnToMainMenu();
+                        System.exit(0); // Exit the entire application
                     }
                 }
             }
