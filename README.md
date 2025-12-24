@@ -66,15 +66,27 @@ The game features a sophisticated **Suggest Button** that analyzes the current b
 
 ### Splash Screen
 ![Splash Screen](screenshots/splash-screen.png)
+*Welcome screen with game title and animated introduction*
 
-### Gameplay
-![Gameplay](screenshots/gameplay.png)
+### Instructions
+![Instructions](screenshots/instruction.png)
+*Helpful guide on how to play the game*
 
 ### Leaderboard
 ![Leaderboard](screenshots/leaderboard.png)
+*Track your high scores and compete with other players*
 
-### AI Suggest Feature
-![AI Suggest Feature](screenshots/suggest-feature.png)
+### Name Input
+![Name Input](screenshots/name-input.png)
+*Enter your name to save your scores*
+
+### Main Panel
+![Main Panel](screenshots/main.png)
+*5×5 game board with smooth tile animations and score tracking*
+
+### Suggestion Feature
+![Suggestion](screenshots/suggestion.png)
+*AI-powered move recommendations to help you strategize*
 
 ---
 
@@ -246,62 +258,11 @@ The-Ultimate-2048-Game/
 └── README.md             # This file
 ```
 
----
-
-## 🛠️ Building from Source
-
-### Prerequisites
-
-- **Java Development Kit (JDK) 8 or higher**
-- **Git** (for cloning the repository)
-
-### Steps
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/markasherabesia19-stack/The-Ultimate-2048-Game.git
-   cd The-Ultimate-2048-Game
-   ```
-
-2. **Build the JAR file**
-
-   **Windows:**
-   ```cmd
-   .\build.bat
-   ```
-
-   **Mac/Linux:**
-   ```bash
-   chmod +x build.sh
-   ./build.sh
-   ```
-
-3. **Run the game**
-   ```bash
-   java -jar Ultimate2048Game.jar
-   ```
-
-### Build Script Details
-
-The build scripts perform the following operations:
-1. Clean previous build artifacts
-2. Compile all Java source files
-3. Copy resources (images and music)
-4. Package everything into a JAR file with proper manifest
-5. Create executable `Ultimate2048Game.jar`
-
----
 
 ## 👥 Contributors
 
 **🎓 Mark Asher G. Abesia** - BSCS 2  
 *Lead Developer & Project Designer*  
 University of the Philippines Tacloban College
-
-**Course**: CMSC 122 - Data Structures and Algorithm  
-**Academic Year**: 2024-2025
-
-
-*Made with ❤️ and ☕ at UP Tacloban*
 
 —9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§———— *.* ◇ *.* ————9§———— *.* ◇ *.* ————9§—
