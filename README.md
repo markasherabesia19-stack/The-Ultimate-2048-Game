@@ -4,7 +4,7 @@
 BS in Computer Science Program  
 University of the Philippines Tacloban College
 
-—9§———— *.* ◇ *.* ————9§———— *.* ◇ *.* ————9§———— *.* ◇ *.* ————9§———— *.* ◇ *.* ————9§—
+—9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§—
 
 ## 📖 Overview
 
@@ -43,7 +43,7 @@ The game features a sophisticated **Suggest Button** that analyzes the current b
 
 ### 🎵 Audio Experience
 
-- **Background Music**: Two ambient tracks (Beachhouse & Satellite)
+- **Background Music**: Two ambient tracks (Space Song by Beach House & Satellite by Harry Styles)
 - **Persistent Playback**: Music continues across game screens
 - **Sound Effects**: Responsive audio feedback for game actions
 
@@ -100,7 +100,7 @@ The game features a sophisticated **Suggest Button** that analyzes the current b
 
 ### Download the Game
 
-**📥 [DOWNLOAD Ultimate2048Game.jar from Google Drive](YOUR_GOOGLE_DRIVE_LINK_HERE)**
+**📥 [DOWNLOAD Ultimate2048Game.jar from Google Drive](https://drive.google.com/drive/folders/19AgLys3qBnBaZkXAzlq5pliS0qbhzjaU?usp=sharing)**
 
 *Replace `YOUR_GOOGLE_DRIVE_LINK_HERE` with your actual Google Drive share link*
 
@@ -265,4 +265,4 @@ The-Ultimate-2048-Game/
 *Lead Developer & Project Designer*  
 University of the Philippines Tacloban College
 
-—9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§———— *.* ◇ *.* ————9§———— *.* ◇ *.* ————9§—
+—9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§—
