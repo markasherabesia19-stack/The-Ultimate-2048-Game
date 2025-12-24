@@ -1,0 +1,8 @@
+# Build artifacts
+build/
+*.jar
+*.class
+
+# IDE files
+.vscode/
+.idea/
