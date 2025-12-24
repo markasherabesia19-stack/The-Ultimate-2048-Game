@@ -1,5 +1,7 @@
 # 🎮 THE ULTIMATE 2048 GAME 🎮
 
+—9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§—
+
 **A final project for CMSC 122: Data Structure and Algorithm**  
 BS in Computer Science Program  
 University of the Philippines Tacloban College
@@ -101,8 +103,6 @@ The game features a sophisticated **Suggest Button** that analyzes the current b
 ### Download the Game
 
 **📥 [DOWNLOAD Ultimate2048Game.jar from Google Drive](https://drive.google.com/drive/folders/19AgLys3qBnBaZkXAzlq5pliS0qbhzjaU?usp=sharing)**
-
-*Replace `YOUR_GOOGLE_DRIVE_LINK_HERE` with your actual Google Drive share link*
 
 ### How to Run
 
