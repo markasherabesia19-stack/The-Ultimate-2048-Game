@@ -1,12 +1,12 @@
-# 🎮 THE ULTIMATE 2048 GAME 🎮
+#  THE ULTIMATE 2048 GAME 
 
-—9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§—
+————9§———— *.* ————9§———— *.* ————9§———— *.* ————9§———— *.* ————9§———— *.* ————9§———— *.* ————
 
 **A final project for CMSC 122: Data Structure and Algorithm**  
 BS in Computer Science Program  
 University of the Philippines Tacloban College
 
-—9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§—
+————9§———— *.* ————9§———— *.* ————9§———— *.* ————9§———— *.* ————9§———— *.* ————9§———— *.* ————
 
 ## 📖 Overview
 
@@ -14,27 +14,27 @@ University of the Philippines Tacloban College
 
 The game features an **expanded 5×5 board** for more complex gameplay and introduces a **Suggest Button** - a move recommendation system that analyzes your board state and provides optimal move suggestions.
 
-### ✨ Key Highlights
+###  Key Highlights
 
-- 🎯 **Expanded 5×5 Board** - More space for strategic gameplay
-- 🤖 **AI-Powered Suggestions** - Smart move recommendations using expectimax algorithm
-- 🎵 **Immersive Audio** - Background music and sound effects
-- 🏆 **Leaderboard System** - Track your high scores and compete
-- 💾 **Persistent Data** - Save and load game progress
-- 🎨 **Polished UI** - Custom graphics and smooth animations
+-  **Expanded 5×5 Board** - More space for strategic gameplay
+-  **AI-Powered Suggestions** - Smart move recommendations using expectimax algorithm
+-  **Immersive Audio** - Background music and sound effects
+-  **Leaderboard System** - Track your high scores and compete
+-  **Persistent Data** - Save and load game progress
+-  **Polished UI** - Custom graphics and smooth animations
 
 ---
 
-## 🎯 Game Features
+##  Game Features
 
-### 🎲 Enhanced Gameplay
+###  Enhanced Gameplay
 
 - **5×5 Grid System**: Larger playing field compared to the classic 4×4 board
 - **Extended Score Potential**: Achieve higher tile values and scores
 - **Smooth Animations**: Fluid tile movements and merge effects
 - **Intuitive Controls**: Arrow keys for seamless gameplay
 
-### 🧠 Intelligent Assist System
+###  Intelligent Assist System
 
 The game features a sophisticated **Suggest Button** that analyzes the current board state and recommends optimal moves:
 
@@ -43,19 +43,19 @@ The game features a sophisticated **Suggest Button** that analyzes the current b
 - **Expectimax Algorithm**: Uses game theory principles to calculate best moves
 - **Visual Feedback**: Clear indication of suggested directions
 
-### 🎵 Audio Experience
+###  Audio Experience
 
 - **Background Music**: Two ambient tracks (Space Song by Beach House & Satellite by Harry Styles)
 - **Persistent Playback**: Music continues across game screens
 - **Sound Effects**: Responsive audio feedback for game actions
 
-### 📊 Progress Tracking
+###  Progress Tracking
 
 - **Local Leaderboard**: Top scores saved automatically
 - **Player Profiles**: Enter your name to track personal records
 - **Score History**: Review past performances
 
-### 🎨 Visual Design
+###  Visual Design
 
 - **Custom Graphics**: Hand-crafted UI elements and tile designs
 - **Color-Coded Tiles**: Easy identification of tile values
@@ -92,7 +92,7 @@ The game features a sophisticated **Suggest Button** that analyzes the current b
 
 ---
 
-## 🚀 Installation & Download
+##  Installation & Download
 
 ### Prerequisites
 
@@ -102,7 +102,7 @@ The game features a sophisticated **Suggest Button** that analyzes the current b
 
 ### Download the Game
 
-**📥 [DOWNLOAD Ultimate2048Game.jar from Google Drive](https://drive.google.com/drive/folders/19AgLys3qBnBaZkXAzlq5pliS0qbhzjaU?usp=sharing)**
+** [DOWNLOAD Ultimate2048Game.jar from Google Drive](https://drive.google.com/drive/folders/19AgLys3qBnBaZkXAzlq5pliS0qbhzjaU?usp=sharing)**
 
 ### How to Run
 
@@ -124,7 +124,7 @@ Once you've downloaded the JAR file:
 
 ---
 
-## 🎮 How to Play
+##  How to Play
 
 ### Game Objective
 
@@ -149,14 +149,14 @@ Combine numbered tiles to create a tile with the value **2048**. Keep playing af
 
 ### Special Features
 
-- **Suggest Button** (💡): Click to receive AI-powered move recommendations
-- **Leaderboard** (🏆): View top scores and player rankings
-- **Music Toggle** (🎵): Control background music playback
+- **Suggest Button** : Click to receive AI-powered move recommendations
+- **Leaderboard** : View top scores and player rankings
+- **Music Toggle** : Control background music playback
 - **New Game**: Start fresh at any time
 
 ---
 
-## 🧠 The Suggest Algorithm
+##  The Suggest Algorithm
 
 The game implements an advanced **Expectimax Algorithm** for move suggestions:
 
@@ -192,7 +192,7 @@ The game implements an advanced **Expectimax Algorithm** for move suggestions:
 
 ---
 
-## 🔧 Tech Stack
+##  Tech Stack
 
 ### Technology Stack
 
@@ -227,7 +227,7 @@ game2048/
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 The-Ultimate-2048-Game/
@@ -259,10 +259,10 @@ The-Ultimate-2048-Game/
 ```
 
 
-## 👥 Contributors
+##  Contributors
 
-**🎓 Mark Asher G. Abesia** - BSCS 2  
+** Mark Asher G. Abesia** - BSCS 2  
 *Lead Developer & Project Designer*  
 University of the Philippines Tacloban College
 
-—9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§—
+————9§———— *.* ————9§———— *.* ————9§———— *.* ————9§———— *.* ————9§———— *.* ————9§———— *.* ————
