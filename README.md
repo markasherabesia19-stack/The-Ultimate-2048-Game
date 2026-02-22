@@ -17,7 +17,7 @@ The game features an **expanded 5×5 board** for more complex gameplay and intro
 ### ✨ Key Highlights
 
 - 🎯 **Expanded 5×5 Board** - More space for strategic gameplay
-- 🤖 **AI-Powered Suggestions** - Smart move recommendations using expectimax algorithm
+- 🤖 **Suggestions** - Smart move recommendations using expectimax algorithm
 - 🎵 **Immersive Audio** - Background music and sound effects
 - 🏆 **Leaderboard System** - Track your high scores and compete
 - 💾 **Persistent Data** - Save and load game progress
@@ -59,7 +59,7 @@ The game features a sophisticated **Suggest Button** that analyzes the current b
 
 - **Custom Graphics**: Hand-crafted UI elements and tile designs
 - **Color-Coded Tiles**: Easy identification of tile values
-- **Splash Screen**: Professional game introduction
+- **Splash Screen**: Organize game introduction
 - **Responsive Layout**: Clean and organized interface
 
 ---
@@ -213,7 +213,7 @@ game2048/
 ├── Game.java              # Core game logic and board management
 ├── Board.java             # Board state and tile operations
 ├── Tile.java              # Individual tile representation
-├── Expectimax.java        # AI suggestion algorithm
+├── Expectimax.java        # Suggestion algorithm
 ├── GameplayScreen.java    # Main game UI
 ├── SplashScreen.java      # Introduction screen
 ├── Leaderboard.java       # Score tracking and display
