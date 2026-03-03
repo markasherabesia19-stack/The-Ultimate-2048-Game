@@ -1,4 +1,4 @@
-# 🎮 THE ULTIMATE 2048 GAME 🎮
+# THE ULTIMATE 2048 GAME 
 
 A final project for CMSC 122: Data Sctructure and Algorithm under the BS in Computer Science program at the University of the Philippines Tacloban College
 
@@ -58,6 +58,6 @@ The Suggest Button implements analysis system:
 
 ## 👥 Contributors
 
-🎓 **Mark Asher G. Abesia** - BSCS 2
+-  **Mark Asher G. Abesia** - BSCS 2
 
-—9§———— *.* 🎮 *.* ————9§———— *.* 🎮 *.* ————9§———— *.* ◇ *.* ————9§———— *.* ◇ *.* ————9§—
+—9§———— *.* ◇ *.* ————9§———— *.* ◇ *.* ————9§———— *.* ◇ *.* ————9§———— *.* ◇ *.* ————9§—
